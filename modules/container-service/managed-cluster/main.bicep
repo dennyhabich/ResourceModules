@@ -392,6 +392,12 @@ param diagnosticMetricsToEnable array = [
 @description('Optional. The name of the diagnostic setting, if deployed. If left empty, it defaults to "<resourceName>-diagnosticSettings".')
 param diagnosticSettingsName string = ''
 
+@description('Optional. Enable VNET integration on the managed cluster".')
+param enableVnetIntegration bool = false
+
+@description('Optional. ResourceID of the subnet for the api server. Required when vnet integration is enabled".')
+param apiServerSubnet string = ''
+
 var diagnosticsLogsSpecified = [for category in filter(diagnosticLogCategoriesToEnable, item => item != 'allLogs' && item != ''): {
   category: category
   enabled: true
@@ -569,6 +575,8 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-06-02-p
       enablePrivateCluster: enablePrivateCluster
       enablePrivateClusterPublicFQDN: enablePrivateClusterPublicFQDN
       privateDNSZone: privateDNSZone
+      enableVnetIntegration: enableVnetIntegration
+      subnetId: enableVnetIntegration ? apiServerSubnet : ''
     }
     podIdentityProfile: {
       allowNetworkPluginKubenet: podIdentityProfileAllowNetworkPluginKubenet
