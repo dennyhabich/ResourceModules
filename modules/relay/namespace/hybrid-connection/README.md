@@ -4,12 +4,12 @@ This module deploys a Relay Namespace Hybrid Connection.
 
 ## Navigation
 
-- [Resource types](#Resource-types)
+- [Resource Types](#Resource-Types)
 - [Parameters](#Parameters)
 - [Outputs](#Outputs)
 - [Cross-referenced modules](#Cross-referenced-modules)
 
-## Resource types
+## Resource Types
 
 | Resource Type | API Version |
 | :-- | :-- |
@@ -22,90 +22,85 @@ This module deploys a Relay Namespace Hybrid Connection.
 
 **Required parameters**
 
-| Parameter Name | Type | Description |
+| Parameter | Type | Description |
 | :-- | :-- | :-- |
-| `name` | string | The name of the hybrid connection. |
-| `userMetadata` | string | The user metadata is a placeholder to store user-defined string data for the hybrid connection endpoint. For example, it can be used to store descriptive data, such as a list of teams and their contact information. Also, user-defined configuration settings can be stored. |
+| [`name`](#parameter-name) | string | The name of the hybrid connection. |
+| [`userMetadata`](#parameter-usermetadata) | string | The user metadata is a placeholder to store user-defined string data for the hybrid connection endpoint. For example, it can be used to store descriptive data, such as a list of teams and their contact information. Also, user-defined configuration settings can be stored. |
 
 **Conditional parameters**
 
-| Parameter Name | Type | Description |
+| Parameter | Type | Description |
 | :-- | :-- | :-- |
-| `namespaceName` | string | The name of the parent Relay Namespace for the Relay Hybrid Connection. Required if the template is used in a standalone deployment. |
+| [`namespaceName`](#parameter-namespacename) | string | The name of the parent Relay Namespace for the Relay Hybrid Connection. Required if the template is used in a standalone deployment. |
 
 **Optional parameters**
 
-| Parameter Name | Type | Default Value | Allowed Values | Description |
-| :-- | :-- | :-- | :-- | :-- |
-| `authorizationRules` | array | `[System.Management.Automation.OrderedHashtable, System.Management.Automation.OrderedHashtable, System.Management.Automation.OrderedHashtable]` |  | Authorization Rules for the Relay Hybrid Connection. |
-| `enableDefaultTelemetry` | bool | `True` |  | Enable telemetry via a Globally Unique Identifier (GUID). |
-| `lock` | string | `''` | `['', CanNotDelete, ReadOnly]` | Specify the type of lock. |
-| `requiresClientAuthorization` | bool | `True` |  | A value indicating if this hybrid connection requires client authorization. |
-| `roleAssignments` | array | `[]` |  | Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'. |
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`authorizationRules`](#parameter-authorizationrules) | array | Authorization Rules for the Relay Hybrid Connection. |
+| [`enableDefaultTelemetry`](#parameter-enabledefaulttelemetry) | bool | Enable telemetry via a Globally Unique Identifier (GUID). |
+| [`lock`](#parameter-lock) | string | Specify the type of lock. |
+| [`requiresClientAuthorization`](#parameter-requiresclientauthorization) | bool | A value indicating if this hybrid connection requires client authorization. |
+| [`roleAssignments`](#parameter-roleassignments) | array | Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'. |
 
+### Parameter: `authorizationRules`
 
-### Parameter Usage: `roleAssignments`
+Authorization Rules for the Relay Hybrid Connection.
+- Required: No
+- Type: array
+- Default: `[System.Management.Automation.OrderedHashtable, System.Management.Automation.OrderedHashtable, System.Management.Automation.OrderedHashtable]`
 
-Create a role assignment for the given resource. If you want to assign a service principal / managed identity that is created in the same deployment, make sure to also specify the `'principalType'` parameter and set it to `'ServicePrincipal'`. This will ensure the role assignment waits for the principal's propagation in Azure.
+### Parameter: `enableDefaultTelemetry`
 
-<details>
+Enable telemetry via a Globally Unique Identifier (GUID).
+- Required: No
+- Type: bool
+- Default: `True`
 
-<summary>Parameter JSON format</summary>
+### Parameter: `lock`
 
-```json
-"roleAssignments": {
-    "value": [
-        {
-            "roleDefinitionIdOrName": "Reader",
-            "description": "Reader Role Assignment",
-            "principalIds": [
-                "12345678-1234-1234-1234-123456789012", // object 1
-                "78945612-1234-1234-1234-123456789012" // object 2
-            ]
-        },
-        {
-            "roleDefinitionIdOrName": "/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11",
-            "principalIds": [
-                "12345678-1234-1234-1234-123456789012" // object 1
-            ],
-            "principalType": "ServicePrincipal"
-        }
-    ]
-}
-```
+Specify the type of lock.
+- Required: No
+- Type: string
+- Default: `''`
+- Allowed: `['', CanNotDelete, ReadOnly]`
 
-</details>
+### Parameter: `name`
 
-<details>
+The name of the hybrid connection.
+- Required: Yes
+- Type: string
 
-<summary>Bicep format</summary>
+### Parameter: `namespaceName`
 
-```bicep
-roleAssignments: [
-    {
-        roleDefinitionIdOrName: 'Reader'
-        description: 'Reader Role Assignment'
-        principalIds: [
-            '12345678-1234-1234-1234-123456789012' // object 1
-            '78945612-1234-1234-1234-123456789012' // object 2
-        ]
-    }
-    {
-        roleDefinitionIdOrName: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'
-        principalIds: [
-            '12345678-1234-1234-1234-123456789012' // object 1
-        ]
-        principalType: 'ServicePrincipal'
-    }
-]
-```
+The name of the parent Relay Namespace for the Relay Hybrid Connection. Required if the template is used in a standalone deployment.
+- Required: Yes
+- Type: string
 
-</details>
-<p>
+### Parameter: `requiresClientAuthorization`
+
+A value indicating if this hybrid connection requires client authorization.
+- Required: No
+- Type: bool
+- Default: `True`
+
+### Parameter: `roleAssignments`
+
+Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'.
+- Required: No
+- Type: array
+- Default: `[]`
+
+### Parameter: `userMetadata`
+
+The user metadata is a placeholder to store user-defined string data for the hybrid connection endpoint. For example, it can be used to store descriptive data, such as a list of teams and their contact information. Also, user-defined configuration settings can be stored.
+- Required: Yes
+- Type: string
+
 
 ## Outputs
 
-| Output Name | Type | Description |
+| Output | Type | Description |
 | :-- | :-- | :-- |
 | `name` | string | The name of the deployed hybrid connection. |
 | `resourceGroupName` | string | The resource group of the deployed hybrid connection. |

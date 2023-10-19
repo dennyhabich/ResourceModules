@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.21.1.54444",
-      "templateHash": "11782317267764138408"
+      "version": "0.22.6.54827",
+      "templateHash": "9177345783229255097"
     },
     "name": "App Configuration Stores",
     "description": "This module deploys an App Configuration Store.",
@@ -96,11 +96,39 @@
         "description": "Optional. The amount of time in days that the configuration store will be retained when it is soft deleted."
       }
     },
+    "cMKKeyVaultResourceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. The resource ID of a key vault to reference a customer managed key for encryption from. Required if \"cMKKeyName\" is not empty."
+      }
+    },
+    "cMKKeyName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. The name of the customer managed key to use for encryption."
+      }
+    },
+    "cMKKeyVersion": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. The version of the customer managed key to reference for encryption. If not provided, the latest key version is used."
+      }
+    },
+    "cMKUserAssignedIdentityResourceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. User assigned identity to use when fetching the customer managed key. The identity should have key usage permissions on the Key Vault Key. Required if \"cMKKeyName\" is not empty."
+      }
+    },
     "keyValues": {
       "type": "array",
       "defaultValue": [],
       "metadata": {
-        "description": "Optional. All Key / Values to create."
+        "description": "Optional. All Key / Values to create. Requires local authentication to be enabled."
       }
     },
     "diagnosticStorageAccountId": {
@@ -251,7 +279,7 @@
     },
     {
       "type": "Microsoft.AppConfiguration/configurationStores",
-      "apiVersion": "2021-10-01-preview",
+      "apiVersion": "2023-03-01",
       "name": "[parameters('name')]",
       "location": "[parameters('location')]",
       "tags": "[parameters('tags')]",
@@ -263,6 +291,7 @@
         "createMode": "[parameters('createMode')]",
         "disableLocalAuth": "[parameters('disableLocalAuth')]",
         "enablePurgeProtection": "[if(equals(parameters('sku'), 'Free'), false(), parameters('enablePurgeProtection'))]",
+        "encryption": "[if(not(empty(parameters('cMKKeyName'))), createObject('keyVaultProperties', createObject('keyIdentifier', if(not(empty(parameters('cMKKeyVersion'))), format('{0}/{1}', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('cMKKeyVaultResourceId'), '/')[2], split(parameters('cMKKeyVaultResourceId'), '/')[4]), 'Microsoft.KeyVault/vaults/keys', last(split(parameters('cMKKeyVaultResourceId'), '/')), parameters('cMKKeyName')), '2022-07-01').keyUri, parameters('cMKKeyVersion')), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('cMKKeyVaultResourceId'), '/')[2], split(parameters('cMKKeyVaultResourceId'), '/')[4]), 'Microsoft.KeyVault/vaults/keys', last(split(parameters('cMKKeyVaultResourceId'), '/')), parameters('cMKKeyName')), '2022-07-01').keyUriWithVersion), 'identityClientId', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('cMKUserAssignedIdentityResourceId'), '/')[2], split(parameters('cMKUserAssignedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', last(split(parameters('cMKUserAssignedIdentityResourceId'), '/'))), '2023-01-31').clientId)), null())]",
         "publicNetworkAccess": "[if(not(empty(parameters('publicNetworkAccess'))), parameters('publicNetworkAccess'), null())]",
         "softDeleteRetentionInDays": "[if(equals(parameters('sku'), 'Free'), 0, parameters('softDeleteRetentionInDays'))]"
       }
@@ -334,8 +363,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "12355291254193028960"
+              "version": "0.22.6.54827",
+              "templateHash": "16264229277476024063"
             },
             "name": "App Configuration Stores Key Values",
             "description": "This module deploys an App Configuration Store Key Value.",
@@ -399,7 +428,7 @@
             },
             {
               "type": "Microsoft.AppConfiguration/configurationStores/keyValues",
-              "apiVersion": "2021-10-01-preview",
+              "apiVersion": "2023-03-01",
               "name": "[format('{0}/{1}', parameters('appConfigurationName'), parameters('name'))]",
               "properties": {
                 "contentType": "[parameters('contentType')]",
@@ -471,8 +500,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "3406373389314015592"
+              "version": "0.22.6.54827",
+              "templateHash": "13848128808282670402"
             }
           },
           "parameters": {
@@ -543,6 +572,8 @@
           },
           "variables": {
             "builtInRoleNames": {
+              "App Compliance Automation Administrator": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '0f37683f-2463-46b6-9ce7-9b788b988ba2')]",
+              "App Compliance Automation Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ffc6bbe0-e443-4c3b-bf54-26581bb2f78e')]",
               "App Configuration Data Owner": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5ae67dd6-50cb-40e7-96ff-dc2bfa4b606b')]",
               "App Configuration Data Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '516239f1-63e1-4d78-a4de-a74fb236a071')]",
               "Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
@@ -633,8 +664,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "14580007913383558904"
+              "version": "0.22.6.54827",
+              "templateHash": "2884140170473394983"
             },
             "name": "Private Endpoints",
             "description": "This module deploys a Private Endpoint.",
@@ -833,8 +864,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "2469208411936339153"
+                      "version": "0.22.6.54827",
+                      "templateHash": "5610247137574346230"
                     },
                     "name": "Private Endpoint Private DNS Zone Groups",
                     "description": "This module deploys a Private Endpoint Private DNS Zone Group.",
@@ -971,8 +1002,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "13032708393704093995"
+                      "version": "0.22.6.54827",
+                      "templateHash": "14351187799927334028"
                     }
                   },
                   "parameters": {
@@ -1179,14 +1210,14 @@
       "metadata": {
         "description": "The principal ID of the system assigned identity."
       },
-      "value": "[if(and(parameters('systemAssignedIdentity'), contains(reference(resourceId('Microsoft.AppConfiguration/configurationStores', parameters('name')), '2021-10-01-preview', 'full').identity, 'principalId')), reference(resourceId('Microsoft.AppConfiguration/configurationStores', parameters('name')), '2021-10-01-preview', 'full').identity.principalId, '')]"
+      "value": "[if(and(parameters('systemAssignedIdentity'), contains(reference(resourceId('Microsoft.AppConfiguration/configurationStores', parameters('name')), '2023-03-01', 'full').identity, 'principalId')), reference(resourceId('Microsoft.AppConfiguration/configurationStores', parameters('name')), '2023-03-01', 'full').identity.principalId, '')]"
     },
     "location": {
       "type": "string",
       "metadata": {
         "description": "The location the resource was deployed into."
       },
-      "value": "[reference(resourceId('Microsoft.AppConfiguration/configurationStores', parameters('name')), '2021-10-01-preview', 'full').location]"
+      "value": "[reference(resourceId('Microsoft.AppConfiguration/configurationStores', parameters('name')), '2023-03-01', 'full').location]"
     }
   }
 }

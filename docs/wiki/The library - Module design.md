@@ -88,7 +88,7 @@ Microsoft.Sql
   └─ databases [child-module/resource]
 ```
 
-In this folder, we recommend to place the child resource-template alongside a ReadMe (that can be generated via the [Set-ModuleReadMe](./Contribution%20guide%20-%20Generate%20module%20Readme) script) and optionally further nest additional folders for it's child resources.
+In this folder, we recommend to place the child resource-template alongside a ReadMe (that can be generated via the [Set-Module](./Contribution%20guide%20-%20Generate%20module%20Readme) script) and optionally further nest additional folders for it's child resources.
 
 The parent template should reference all it's direct child-templates to allow for an end-to-end deployment experience while allowing any user to also reference 'just' the child resource itself. In case of the SQL server example, the server template would reference the database module and encapsulate it in a loop to allow for the deployment of multiple databases. For example
 
@@ -583,7 +583,6 @@ Its primary components are in order:
 - A short description
 - A **Resource types** section with a table that outlines all resources that can be deployed as part of the module.
 - A **Parameters** section with a table containing all parameters, their type, default and allowed values if any, and their description.
-- Optionally, a **Parameter Usage** section that shows how to use complex structures such as parameter objects or array of objects, e.g., roleAssignments, tags, privateEndpoints.
 - An **Outputs** section with a table that describes all outputs the module template returns.
 - A **Template references** section listing relevant resources [Azure resource reference](https://learn.microsoft.com/en-us/azure/templates).
 
