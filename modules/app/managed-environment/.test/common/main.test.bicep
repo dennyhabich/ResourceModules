@@ -8,7 +8,7 @@ metadata description = 'This instance deploys the module with most of its featur
 // ========== //
 @description('Optional. The name of the resource group to deploy for testing purposes.')
 @maxLength(90)
-param resourceGroupName string = 'ms.app.managedenvironments-${serviceShort}-rg'
+param resourceGroupName string = 'dep-${namePrefix}-app.managedenvironments-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
 param location string = deployment().location
@@ -60,7 +60,10 @@ module testDeployment '../../main.bicep' = {
     platformReservedCidr: '172.17.17.0/24'
     platformReservedDnsIP: '172.17.17.17'
     infrastructureSubnetId: nestedDependencies.outputs.subnetResourceId
-    lock: 'CanNotDelete'
+    lock: {
+      kind: 'CanNotDelete'
+      name: 'myCustomLockName'
+    }
     tags: {
       'hidden-title': 'This is visible in the resource name'
       Env: 'test'

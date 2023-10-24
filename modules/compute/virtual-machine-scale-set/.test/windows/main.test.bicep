@@ -6,7 +6,7 @@ targetScope = 'subscription'
 
 @description('Optional. The name of the resource group to deploy for testing purposes.')
 @maxLength(90)
-param resourceGroupName string = 'ms.compute.virtualmachinescalesets-${serviceShort}-rg'
+param resourceGroupName string = 'dep-${namePrefix}-compute.virtualmachinescalesets-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
 param location string = deployment().location
@@ -149,7 +149,10 @@ module testDeployment '../../main.bicep' = {
     extensionNetworkWatcherAgentConfig: {
       enabled: true
     }
-    lock: 'CanNotDelete'
+    lock: {
+      kind: 'CanNotDelete'
+      name: 'myCustomLockName'
+    }
     nicConfigurations: [
       {
         ipConfigurations: [
@@ -168,10 +171,9 @@ module testDeployment '../../main.bicep' = {
     proximityPlacementGroupResourceId: nestedDependencies.outputs.proximityPlacementGroupResourceId
     roleAssignments: [
       {
-        principalIds: [
-          nestedDependencies.outputs.managedIdentityPrincipalId
-        ]
+        principalId: nestedDependencies.outputs.managedIdentityPrincipalId
         roleDefinitionIdOrName: 'Reader'
+        principalType: 'ServicePrincipal'
       }
     ]
     skuCapacity: 1

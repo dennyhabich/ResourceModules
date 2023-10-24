@@ -6,7 +6,7 @@ targetScope = 'subscription'
 
 @description('Optional. The name of the resource group to deploy for testing purposes.')
 @maxLength(90)
-param resourceGroupName string = 'ms.dbforpostgresql.flexibleservers-${serviceShort}-rg'
+param resourceGroupName string = 'dep-${namePrefix}-dbforpostgresql.flexibleservers-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
 param location string = deployment().location
@@ -100,7 +100,7 @@ module testDeployment '../../main.bicep' = {
     diagnosticEventHubAuthorizationRuleId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
     diagnosticEventHubName: diagnosticDependencies.outputs.eventHubNamespaceEventHubName
     geoRedundantBackup: 'Enabled'
-    privateDnsZoneArmResourceId: nestedDependencies.outputs.privateDNSResourceId
+    privateDnsZoneArmResourceId: nestedDependencies.outputs.privateDNSZoneResourceId
     tags: {
       'hidden-title': 'This is visible in the resource name'
       Environment: 'Non-Prod'

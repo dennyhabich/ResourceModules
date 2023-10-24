@@ -6,7 +6,7 @@ targetScope = 'subscription'
 
 @description('Optional. The name of the resource group to deploy for testing purposes.')
 @maxLength(90)
-param resourceGroupName string = 'ms.keyvault.vaults-${serviceShort}-rg'
+param resourceGroupName string = 'dep-${namePrefix}-keyvault.vaults-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
 param location string = deployment().location
@@ -87,12 +87,10 @@ module testDeployment '../../main.bicep' = {
     }
     privateEndpoints: [
       {
-        privateDnsZoneGroup: {
-          privateDNSResourceIds: [
-            nestedDependencies.outputs.privateDNSResourceId
-          ]
-          privateEndpointName: 'dep-${namePrefix}-pe-${serviceShort}'
-        }
+        privateDnsZoneResourceIds: [
+          nestedDependencies.outputs.privateDNSZoneResourceId
+        ]
+        name: 'dep-${namePrefix}-pe-${serviceShort}'
         service: 'vault'
         subnetResourceId: nestedDependencies.outputs.subnetResourceId
         tags: {

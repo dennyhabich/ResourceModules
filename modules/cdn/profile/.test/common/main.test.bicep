@@ -9,7 +9,7 @@ metadata description = 'This instance deploys the module with most of its featur
 
 @description('Optional. The name of the resource group to deploy for testing purposes.')
 @maxLength(90)
-param resourceGroupName string = 'ms.cdn.profiles-${serviceShort}-rg'
+param resourceGroupName string = 'dep-${namePrefix}-cdn.profiles-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
 param location string = deployment().location
@@ -53,7 +53,10 @@ module testDeployment '../../main.bicep' = {
   params: {
     name: 'dep-${namePrefix}-test-${serviceShort}'
     location: location
-    lock: 'CanNotDelete'
+    lock: {
+      kind: 'CanNotDelete'
+      name: 'myCustomLockName'
+    }
     originResponseTimeoutSeconds: 60
     sku: 'Standard_Verizon'
     enableDefaultTelemetry: enableDefaultTelemetry
@@ -90,9 +93,7 @@ module testDeployment '../../main.bicep' = {
     roleAssignments: [
       {
         roleDefinitionIdOrName: 'Reader'
-        principalIds: [
-          nestedDependencies.outputs.managedIdentityPrincipalId
-        ]
+        principalId: nestedDependencies.outputs.managedIdentityPrincipalId
         principalType: 'ServicePrincipal'
       }
     ]
