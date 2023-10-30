@@ -351,6 +351,12 @@ param httpProxyConfig object = {}
 @description('Optional. Identities associated with the cluster.')
 param identityProfile object = {}
 
+@description('Optional. Enable VNET integration on the managed cluster".')
+param enableVnetIntegration bool = false
+
+@description('Optional. ResourceID of the subnet for the api server. Required when VNET integration is enabled".')
+param vnetIntegrationSubnet string = ''
+
 var identityType = systemAssignedIdentity ? 'SystemAssigned' : (!empty(userAssignedIdentities) ? 'UserAssigned' : 'None')
 
 var identity = {
@@ -534,6 +540,8 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
       enablePrivateCluster: enablePrivateCluster
       enablePrivateClusterPublicFQDN: enablePrivateClusterPublicFQDN
       privateDNSZone: privateDNSZone
+      enableVnetIntegration: enableVnetIntegration
+      subnetId: enableVnetIntegration ? vnetIntegrationSubnet : ''
     }
     podIdentityProfile: {
       allowNetworkPluginKubenet: podIdentityProfileAllowNetworkPluginKubenet
