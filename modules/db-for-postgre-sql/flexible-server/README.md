@@ -341,14 +341,16 @@ module flexibleServer 'br:bicep/modules/db-for-postgre-sql.flexible-server:1.0.0
     geoRedundantBackup: 'Disabled'
     highAvailability: 'SameZone'
     location: '<location>'
+    managedIdentities: {
+      userAssignedResourcesIds: [
+        '<managedIdentityResourceId>'
+      ]
+    }
     storageSizeGB: 1024
     tags: {
       Environment: 'Non-Prod'
       'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
-    }
-    userAssignedIdentities: {
-      '<managedIdentityResourceId>': {}
     }
     version: '14'
   }
@@ -470,6 +472,13 @@ module flexibleServer 'br:bicep/modules/db-for-postgre-sql.flexible-server:1.0.0
     "location": {
       "value": "<location>"
     },
+    "managedIdentities": {
+      "value": {
+        "userAssignedResourcesIds": [
+          "<managedIdentityResourceId>"
+        ]
+      }
+    },
     "storageSizeGB": {
       "value": 1024
     },
@@ -478,11 +487,6 @@ module flexibleServer 'br:bicep/modules/db-for-postgre-sql.flexible-server:1.0.0
         "Environment": "Non-Prod",
         "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
-      }
-    },
-    "userAssignedIdentities": {
-      "value": {
-        "<managedIdentityResourceId>": {}
       }
     },
     "version": {
@@ -512,9 +516,9 @@ module flexibleServer 'br:bicep/modules/db-for-postgre-sql.flexible-server:1.0.0
 | :-- | :-- | :-- |
 | [`cMKKeyVaultResourceId`](#parameter-cmkkeyvaultresourceid) | string | The resource ID of a key vault to reference a customer managed key for encryption from. Required if 'cMKKeyName' is not empty. |
 | [`cMKUserAssignedIdentityResourceId`](#parameter-cmkuserassignedidentityresourceid) | string | User assigned identity to use when fetching the customer managed key. The identity should have key usage permissions on the Key Vault Key. Required if 'cMKKeyName' is not empty. |
+| [`managedIdentities`](#parameter-managedidentities) | object | The managed identity definition for this resource. Required if 'cMKKeyName' is not empty. |
 | [`pointInTimeUTC`](#parameter-pointintimeutc) | string | Required if "createMode" is set to "PointInTimeRestore". |
 | [`sourceServerResourceId`](#parameter-sourceserverresourceid) | string | Required if "createMode" is set to "PointInTimeRestore". |
-| [`userAssignedIdentities`](#parameter-userassignedidentities) | object | The ID(s) to assign to the resource. Required if 'cMKKeyName' is not empty. |
 
 **Optional parameters**
 
@@ -554,7 +558,13 @@ If Enabled, Azure Active Directory authentication is enabled.
 - Required: No
 - Type: string
 - Default: `'Enabled'`
-- Allowed: `[Disabled, Enabled]`
+- Allowed:
+  ```Bicep
+  [
+    'Disabled'
+    'Enabled'
+  ]
+  ```
 
 ### Parameter: `administratorLogin`
 
@@ -583,7 +593,15 @@ Availability zone information of the server. Default will have no preference set
 - Required: No
 - Type: string
 - Default: `''`
-- Allowed: `['', 1, 2, 3]`
+- Allowed:
+  ```Bicep
+  [
+    ''
+    '1'
+    '2'
+    '3'
+  ]
+  ```
 
 ### Parameter: `backupRetentionDays`
 
@@ -633,7 +651,15 @@ The mode to create a new PostgreSQL server.
 - Required: No
 - Type: string
 - Default: `'Default'`
-- Allowed: `[Create, Default, PointInTimeRestore, Update]`
+- Allowed:
+  ```Bicep
+  [
+    'Create'
+    'Default'
+    'PointInTimeRestore'
+    'Update'
+  ]
+  ```
 
 ### Parameter: `databases`
 
@@ -784,7 +810,13 @@ A value indicating whether Geo-Redundant backup is enabled on the server. Should
 - Required: No
 - Type: string
 - Default: `'Disabled'`
-- Allowed: `[Disabled, Enabled]`
+- Allowed:
+  ```Bicep
+  [
+    'Disabled'
+    'Enabled'
+  ]
+  ```
 
 ### Parameter: `highAvailability`
 
@@ -792,7 +824,14 @@ The mode for high availability.
 - Required: No
 - Type: string
 - Default: `'Disabled'`
-- Allowed: `[Disabled, SameZone, ZoneRedundant]`
+- Allowed:
+  ```Bicep
+  [
+    'Disabled'
+    'SameZone'
+    'ZoneRedundant'
+  ]
+  ```
 
 ### Parameter: `location`
 
@@ -833,7 +872,25 @@ Optional. Specify the name of lock.
 Properties for the maintenence window. If provided, "customWindow" property must exist and set to "Enabled".
 - Required: No
 - Type: object
-- Default: `{object}`
+- Default: `{}`
+
+### Parameter: `managedIdentities`
+
+The managed identity definition for this resource. Required if 'cMKKeyName' is not empty.
+- Required: No
+- Type: object
+
+
+| Name | Required | Type | Description |
+| :-- | :-- | :--| :-- |
+| [`userAssignedResourcesIds`](#parameter-managedidentitiesuserassignedresourcesids) | Yes | array | Optional. The resource ID(s) to assign to the resource. |
+
+### Parameter: `managedIdentities.userAssignedResourcesIds`
+
+Optional. The resource ID(s) to assign to the resource.
+
+- Required: Yes
+- Type: array
 
 ### Parameter: `name`
 
@@ -847,7 +904,13 @@ If Enabled, password authentication is enabled.
 - Required: No
 - Type: string
 - Default: `'Disabled'`
-- Allowed: `[Disabled, Enabled]`
+- Allowed:
+  ```Bicep
+  [
+    'Disabled'
+    'Enabled'
+  ]
+  ```
 
 ### Parameter: `pointInTimeUTC`
 
@@ -950,14 +1013,27 @@ Max storage allowed for a server.
 - Required: No
 - Type: int
 - Default: `32`
-- Allowed: `[32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384]`
+- Allowed:
+  ```Bicep
+  [
+    32
+    64
+    128
+    256
+    512
+    1024
+    2048
+    4096
+    8192
+    16384
+  ]
+  ```
 
 ### Parameter: `tags`
 
 Tags of the resource.
 - Required: No
 - Type: object
-- Default: `{object}`
 
 ### Parameter: `tenantId`
 
@@ -971,14 +1047,14 @@ Tenant id of the server.
 The tier of the particular SKU. Tier must align with the "skuName" property. Example, tier cannot be "Burstable" if skuName is "Standard_D4s_v3".
 - Required: Yes
 - Type: string
-- Allowed: `[Burstable, GeneralPurpose, MemoryOptimized]`
-
-### Parameter: `userAssignedIdentities`
-
-The ID(s) to assign to the resource. Required if 'cMKKeyName' is not empty.
-- Required: No
-- Type: object
-- Default: `{object}`
+- Allowed:
+  ```Bicep
+  [
+    'Burstable'
+    'GeneralPurpose'
+    'MemoryOptimized'
+  ]
+  ```
 
 ### Parameter: `version`
 
@@ -986,7 +1062,16 @@ PostgreSQL Server version.
 - Required: No
 - Type: string
 - Default: `'15'`
-- Allowed: `[11, 12, 13, 14, 15]`
+- Allowed:
+  ```Bicep
+  [
+    '11'
+    '12'
+    '13'
+    '14'
+    '15'
+  ]
+  ```
 
 
 ## Outputs

@@ -185,6 +185,12 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
       kind: 'CanNotDelete'
       name: 'myCustomLockName'
     }
+    managedIdentities: {
+      systemAssigned: true
+      userAssignedResourcesIds: [
+        '<managedIdentityResourceId>'
+      ]
+    }
     managementPolicyRules: [
       {
         definition: {
@@ -295,7 +301,6 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
     ]
     sasExpirationPeriod: '180.00:00:00'
     skuName: 'Standard_LRS'
-    systemAssignedIdentity: true
     tableServices: {
       diagnosticSettings: [
         {
@@ -320,9 +325,6 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
       Environment: 'Non-Prod'
       'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
-    }
-    userAssignedIdentities: {
-      '<managedIdentityResourceId>': {}
     }
   }
 }
@@ -489,6 +491,14 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
         "name": "myCustomLockName"
       }
     },
+    "managedIdentities": {
+      "value": {
+        "systemAssigned": true,
+        "userAssignedResourcesIds": [
+          "<managedIdentityResourceId>"
+        ]
+      }
+    },
     "managementPolicyRules": {
       "value": [
         {
@@ -615,9 +625,6 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
     "skuName": {
       "value": "Standard_LRS"
     },
-    "systemAssignedIdentity": {
-      "value": true
-    },
     "tableServices": {
       "value": {
         "diagnosticSettings": [
@@ -645,11 +652,6 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
         "Environment": "Non-Prod",
         "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
-      }
-    },
-    "userAssignedIdentities": {
-      "value": {
-        "<managedIdentityResourceId>": {}
       }
     }
   }
@@ -698,6 +700,12 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
     cMKKeyVaultResourceId: '<cMKKeyVaultResourceId>'
     cMKUserAssignedIdentityResourceId: '<cMKUserAssignedIdentityResourceId>'
     enableDefaultTelemetry: '<enableDefaultTelemetry>'
+    managedIdentities: {
+      systemAssigned: false
+      userAssignedResourcesIds: [
+        '<managedIdentityResourceId>'
+      ]
+    }
     privateEndpoints: [
       {
         privateDnsZoneResourceIds: [
@@ -714,14 +722,10 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
     ]
     requireInfrastructureEncryption: true
     skuName: 'Standard_LRS'
-    systemAssignedIdentity: false
     tags: {
       Environment: 'Non-Prod'
       'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
-    }
-    userAssignedIdentities: {
-      '<managedIdentityResourceId>': {}
     }
   }
 }
@@ -782,6 +786,14 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
     "enableDefaultTelemetry": {
       "value": "<enableDefaultTelemetry>"
     },
+    "managedIdentities": {
+      "value": {
+        "systemAssigned": false,
+        "userAssignedResourcesIds": [
+          "<managedIdentityResourceId>"
+        ]
+      }
+    },
     "privateEndpoints": {
       "value": [
         {
@@ -804,19 +816,11 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
     "skuName": {
       "value": "Standard_LRS"
     },
-    "systemAssignedIdentity": {
-      "value": false
-    },
     "tags": {
       "value": {
         "Environment": "Non-Prod",
         "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
-      }
-    },
-    "userAssignedIdentities": {
-      "value": {
-        "<managedIdentityResourceId>": {}
       }
     }
   }
@@ -920,6 +924,12 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
       kind: 'CanNotDelete'
       name: 'myCustomLockName'
     }
+    managedIdentities: {
+      systemAssigned: true
+      userAssignedResourcesIds: [
+        '<managedIdentityResourceId>'
+      ]
+    }
     roleAssignments: [
       {
         principalId: '<principalId>'
@@ -929,14 +939,10 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
     ]
     skuName: 'Premium_LRS'
     supportsHttpsTrafficOnly: false
-    systemAssignedIdentity: true
     tags: {
       Environment: 'Non-Prod'
       'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
-    }
-    userAssignedIdentities: {
-      '<managedIdentityResourceId>': {}
     }
   }
 }
@@ -1000,6 +1006,14 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
         "name": "myCustomLockName"
       }
     },
+    "managedIdentities": {
+      "value": {
+        "systemAssigned": true,
+        "userAssignedResourcesIds": [
+          "<managedIdentityResourceId>"
+        ]
+      }
+    },
     "roleAssignments": {
       "value": [
         {
@@ -1015,19 +1029,11 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
     "supportsHttpsTrafficOnly": {
       "value": false
     },
-    "systemAssignedIdentity": {
-      "value": true
-    },
     "tags": {
       "value": {
         "Environment": "Non-Prod",
         "hidden-title": "This is visible in the resource name",
         "Role": "DeploymentValidation"
-      }
-    },
-    "userAssignedIdentities": {
-      "value": {
-        "<managedIdentityResourceId>": {}
       }
     }
   }
@@ -1147,6 +1153,7 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
 | [`localUsers`](#parameter-localusers) | array | Local users to deploy for SFTP authentication. |
 | [`location`](#parameter-location) | string | Location for all resources. |
 | [`lock`](#parameter-lock) | object | The lock settings of the service. |
+| [`managedIdentities`](#parameter-managedidentities) | object | The managed identity definition for this resource. |
 | [`managementPolicyRules`](#parameter-managementpolicyrules) | array | The Storage Account ManagementPolicies Rules. |
 | [`minimumTlsVersion`](#parameter-minimumtlsversion) | string | Set the minimum TLS version on request to storage. |
 | [`networkAcls`](#parameter-networkacls) | object | Networks ACLs, this value contains IPs to whitelist and/or Subnet information. For security reasons, it is recommended to set the DefaultAction Deny. |
@@ -1158,10 +1165,8 @@ module storageAccount 'br:bicep/modules/storage.storage-account:1.0.0' = {
 | [`sasExpirationPeriod`](#parameter-sasexpirationperiod) | string | The SAS expiration period. DD.HH:MM:SS. |
 | [`skuName`](#parameter-skuname) | string | Storage Account Sku Name. |
 | [`supportsHttpsTrafficOnly`](#parameter-supportshttpstrafficonly) | bool | Allows HTTPS traffic only to storage service if sets to true. |
-| [`systemAssignedIdentity`](#parameter-systemassignedidentity) | bool | Enables system assigned managed identity on the resource. |
 | [`tableServices`](#parameter-tableservices) | object | Table service and tables to create. |
 | [`tags`](#parameter-tags) | object | Tags of the resource. |
-| [`userAssignedIdentities`](#parameter-userassignedidentities) | object | The ID(s) to assign to the resource. |
 
 ### Parameter: `accessTier`
 
@@ -1169,7 +1174,14 @@ Required if the Storage Account kind is set to BlobStorage. The access tier is u
 - Required: No
 - Type: string
 - Default: `'Hot'`
-- Allowed: `[Cool, Hot, Premium]`
+- Allowed:
+  ```Bicep
+  [
+    'Cool'
+    'Hot'
+    'Premium'
+  ]
+  ```
 
 ### Parameter: `allowBlobPublicAccess`
 
@@ -1191,7 +1203,14 @@ Restrict copy to and from Storage Accounts within an AAD tenant or with Private 
 - Required: No
 - Type: string
 - Default: `''`
-- Allowed: `['', AAD, PrivateLink]`
+- Allowed:
+  ```Bicep
+  [
+    ''
+    'AAD'
+    'PrivateLink'
+  ]
+  ```
 
 ### Parameter: `allowSharedKeyAccess`
 
@@ -1205,14 +1224,14 @@ Indicates whether the storage account permits requests to be authorized with the
 Provides the identity based authentication settings for Azure Files.
 - Required: No
 - Type: object
-- Default: `{object}`
+- Default: `{}`
 
 ### Parameter: `blobServices`
 
 Blob service and containers to deploy.
 - Required: No
 - Type: object
-- Default: `{object}`
+- Default: `{}`
 
 ### Parameter: `cMKKeyName`
 
@@ -1356,7 +1375,14 @@ Allows you to specify the type of endpoint. Set this to AzureDNSZone to create a
 - Required: No
 - Type: string
 - Default: `''`
-- Allowed: `['', AzureDnsZone, Standard]`
+- Allowed:
+  ```Bicep
+  [
+    ''
+    'AzureDnsZone'
+    'Standard'
+  ]
+  ```
 
 ### Parameter: `enableDefaultTelemetry`
 
@@ -1391,7 +1417,7 @@ If true, enables Secure File Transfer Protocol for the storage account. Requires
 File service and shares to deploy.
 - Required: No
 - Type: object
-- Default: `{object}`
+- Default: `{}`
 
 ### Parameter: `isLocalUserEnabled`
 
@@ -1406,7 +1432,16 @@ Type of Storage Account to create.
 - Required: No
 - Type: string
 - Default: `'StorageV2'`
-- Allowed: `[BlobStorage, BlockBlobStorage, FileStorage, Storage, StorageV2]`
+- Allowed:
+  ```Bicep
+  [
+    'BlobStorage'
+    'BlockBlobStorage'
+    'FileStorage'
+    'Storage'
+    'StorageV2'
+  ]
+  ```
 
 ### Parameter: `largeFileSharesState`
 
@@ -1414,7 +1449,13 @@ Allow large file shares if sets to 'Enabled'. It cannot be disabled once it is e
 - Required: No
 - Type: string
 - Default: `'Disabled'`
-- Allowed: `[Disabled, Enabled]`
+- Allowed:
+  ```Bicep
+  [
+    'Disabled'
+    'Enabled'
+  ]
+  ```
 
 ### Parameter: `localUsers`
 
@@ -1457,6 +1498,32 @@ Optional. Specify the name of lock.
 - Required: No
 - Type: string
 
+### Parameter: `managedIdentities`
+
+The managed identity definition for this resource.
+- Required: No
+- Type: object
+
+
+| Name | Required | Type | Description |
+| :-- | :-- | :--| :-- |
+| [`systemAssigned`](#parameter-managedidentitiessystemassigned) | No | bool | Optional. Enables system assigned managed identity on the resource. |
+| [`userAssignedResourcesIds`](#parameter-managedidentitiesuserassignedresourcesids) | No | array | Optional. The resource ID(s) to assign to the resource. |
+
+### Parameter: `managedIdentities.systemAssigned`
+
+Optional. Enables system assigned managed identity on the resource.
+
+- Required: No
+- Type: bool
+
+### Parameter: `managedIdentities.userAssignedResourcesIds`
+
+Optional. The resource ID(s) to assign to the resource.
+
+- Required: No
+- Type: array
+
 ### Parameter: `managementPolicyRules`
 
 The Storage Account ManagementPolicies Rules.
@@ -1470,7 +1537,14 @@ Set the minimum TLS version on request to storage.
 - Required: No
 - Type: string
 - Default: `'TLS1_2'`
-- Allowed: `[TLS1_0, TLS1_1, TLS1_2]`
+- Allowed:
+  ```Bicep
+  [
+    'TLS1_0'
+    'TLS1_1'
+    'TLS1_2'
+  ]
+  ```
 
 ### Parameter: `name`
 
@@ -1483,7 +1557,7 @@ Name of the Storage Account.
 Networks ACLs, this value contains IPs to whitelist and/or Subnet information. For security reasons, it is recommended to set the DefaultAction Deny.
 - Required: No
 - Type: object
-- Default: `{object}`
+- Default: `{}`
 
 ### Parameter: `privateEndpoints`
 
@@ -1659,14 +1733,21 @@ Whether or not public network access is allowed for this resource. For security 
 - Required: No
 - Type: string
 - Default: `''`
-- Allowed: `['', Disabled, Enabled]`
+- Allowed:
+  ```Bicep
+  [
+    ''
+    'Disabled'
+    'Enabled'
+  ]
+  ```
 
 ### Parameter: `queueServices`
 
 Queue service and queues to create.
 - Required: No
 - Type: object
-- Default: `{object}`
+- Default: `{}`
 
 ### Parameter: `requireInfrastructureEncryption`
 
@@ -1756,7 +1837,19 @@ Storage Account Sku Name.
 - Required: No
 - Type: string
 - Default: `'Standard_GRS'`
-- Allowed: `[Premium_LRS, Premium_ZRS, Standard_GRS, Standard_GZRS, Standard_LRS, Standard_RAGRS, Standard_RAGZRS, Standard_ZRS]`
+- Allowed:
+  ```Bicep
+  [
+    'Premium_LRS'
+    'Premium_ZRS'
+    'Standard_GRS'
+    'Standard_GZRS'
+    'Standard_LRS'
+    'Standard_RAGRS'
+    'Standard_RAGZRS'
+    'Standard_ZRS'
+  ]
+  ```
 
 ### Parameter: `supportsHttpsTrafficOnly`
 
@@ -1765,33 +1858,18 @@ Allows HTTPS traffic only to storage service if sets to true.
 - Type: bool
 - Default: `True`
 
-### Parameter: `systemAssignedIdentity`
-
-Enables system assigned managed identity on the resource.
-- Required: No
-- Type: bool
-- Default: `False`
-
 ### Parameter: `tableServices`
 
 Table service and tables to create.
 - Required: No
 - Type: object
-- Default: `{object}`
+- Default: `{}`
 
 ### Parameter: `tags`
 
 Tags of the resource.
 - Required: No
 - Type: object
-- Default: `{object}`
-
-### Parameter: `userAssignedIdentities`
-
-The ID(s) to assign to the resource.
-- Required: No
-- Type: object
-- Default: `{object}`
 
 
 ## Outputs
@@ -1803,7 +1881,7 @@ The ID(s) to assign to the resource.
 | `primaryBlobEndpoint` | string | The primary blob endpoint reference if blob services are deployed. |
 | `resourceGroupName` | string | The resource group of the deployed storage account. |
 | `resourceId` | string | The resource ID of the deployed storage account. |
-| `systemAssignedPrincipalId` | string | The principal ID of the system assigned identity. |
+| `systemAssignedMIPrincipalId` | string | The principal ID of the system assigned identity. |
 
 ## Cross-referenced modules
 

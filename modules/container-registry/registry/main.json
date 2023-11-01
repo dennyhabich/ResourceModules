@@ -6,13 +6,36 @@
     "_generator": {
       "name": "bicep",
       "version": "0.22.6.54827",
-      "templateHash": "18353793336919307909"
+      "templateHash": "4552885966837623579"
     },
     "name": "Azure Container Registries (ACR)",
     "description": "This module deploys an Azure Container Registry (ACR).",
     "owner": "Azure/module-maintainers"
   },
   "definitions": {
+    "managedIdentitiesType": {
+      "type": "object",
+      "properties": {
+        "systemAssigned": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Enables system assigned managed identity on the resource."
+          }
+        },
+        "userAssignedResourcesIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The resource ID(s) to assign to the resource."
+          }
+        }
+      },
+      "nullable": true
+    },
     "lockType": {
       "type": "object",
       "properties": {
@@ -566,23 +589,15 @@
         "description": "Optional. The lock settings of the service."
       }
     },
-    "systemAssignedIdentity": {
-      "type": "bool",
-      "defaultValue": false,
+    "managedIdentities": {
+      "$ref": "#/definitions/managedIdentitiesType",
       "metadata": {
-        "description": "Optional. Enables system assigned managed identity on the resource."
-      }
-    },
-    "userAssignedIdentities": {
-      "type": "object",
-      "defaultValue": {},
-      "metadata": {
-        "description": "Optional. The ID(s) to assign to the resource."
+        "description": "Optional. The managed identity definition for this resource."
       }
     },
     "tags": {
       "type": "object",
-      "defaultValue": {},
+      "nullable": true,
       "metadata": {
         "description": "Optional. Tags of the resource."
       }
@@ -644,8 +659,8 @@
     }
   },
   "variables": {
-    "identityType": "[if(parameters('systemAssignedIdentity'), if(not(empty(parameters('userAssignedIdentities'))), 'SystemAssigned,UserAssigned', 'SystemAssigned'), if(not(empty(parameters('userAssignedIdentities'))), 'UserAssigned', 'None'))]",
-    "identity": "[if(not(equals(variables('identityType'), 'None')), createObject('type', variables('identityType'), 'userAssignedIdentities', if(not(empty(parameters('userAssignedIdentities'))), parameters('userAssignedIdentities'), null())), null())]",
+    "formattedUserAssignedIdentities": "[reduce(map(coalesce(tryGet(parameters('managedIdentities'), 'userAssignedResourcesIds'), createArray()), lambda('id', createObject(format('{0}', lambdaVariables('id')), createObject()))), createObject(), lambda('cur', 'next', union(lambdaVariables('cur'), lambdaVariables('next'))))]",
+    "identity": "[if(not(empty(parameters('managedIdentities'))), createObject('type', if(coalesce(tryGet(parameters('managedIdentities'), 'systemAssigned'), false()), if(not(empty(coalesce(tryGet(parameters('managedIdentities'), 'userAssignedResourcesIds'), createObject()))), 'SystemAssigned,UserAssigned', 'SystemAssigned'), if(not(empty(coalesce(tryGet(parameters('managedIdentities'), 'userAssignedResourcesIds'), createObject()))), 'UserAssigned', null())), 'userAssignedIdentities', if(not(empty(variables('formattedUserAssignedIdentities'))), variables('formattedUserAssignedIdentities'), null())), null())]",
     "enableReferencedModulesTelemetry": false,
     "builtInRoleNames": {
       "AcrDelete": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'c2f4ef07-c644-48eb-af81-4b1b4947fb11')]",
@@ -833,19 +848,22 @@
           },
           "regionEndpointEnabled": "[if(contains(parameters('replications')[copyIndex()], 'regionEndpointEnabled'), createObject('value', parameters('replications')[copyIndex()].regionEndpointEnabled), createObject('value', true()))]",
           "zoneRedundancy": "[if(contains(parameters('replications')[copyIndex()], 'zoneRedundancy'), createObject('value', parameters('replications')[copyIndex()].zoneRedundancy), createObject('value', 'Disabled'))]",
-          "tags": "[if(contains(parameters('replications')[copyIndex()], 'tags'), createObject('value', parameters('replications')[copyIndex()].tags), createObject('value', createObject()))]",
+          "tags": {
+            "value": "[coalesce(tryGet(parameters('replications')[copyIndex()], 'tags'), parameters('tags'))]"
+          },
           "enableDefaultTelemetry": {
             "value": "[variables('enableReferencedModulesTelemetry')]"
           }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
           "contentVersion": "1.0.0.0",
           "metadata": {
             "_generator": {
               "name": "bicep",
               "version": "0.22.6.54827",
-              "templateHash": "3105247041693395359"
+              "templateHash": "12719783741437890545"
             },
             "name": "Azure Container Registry (ACR) Replications",
             "description": "This module deploys an Azure Container Registry (ACR) Replication.",
@@ -873,7 +891,7 @@
             },
             "tags": {
               "type": "object",
-              "defaultValue": {},
+              "nullable": true,
               "metadata": {
                 "description": "Optional. Tags of the resource."
               }
@@ -904,8 +922,8 @@
               }
             }
           },
-          "resources": [
-            {
+          "resources": {
+            "defaultTelemetry": {
               "condition": "[parameters('enableDefaultTelemetry')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2021-04-01",
@@ -919,7 +937,13 @@
                 }
               }
             },
-            {
+            "registry": {
+              "existing": true,
+              "type": "Microsoft.ContainerRegistry/registries",
+              "apiVersion": "2023-06-01-preview",
+              "name": "[parameters('registryName')]"
+            },
+            "replication": {
               "type": "Microsoft.ContainerRegistry/registries/replications",
               "apiVersion": "2023-06-01-preview",
               "name": "[format('{0}/{1}', parameters('registryName'), parameters('name'))]",
@@ -928,9 +952,12 @@
               "properties": {
                 "regionEndpointEnabled": "[parameters('regionEndpointEnabled')]",
                 "zoneRedundancy": "[parameters('zoneRedundancy')]"
-              }
+              },
+              "dependsOn": [
+                "registry"
+              ]
             }
-          ],
+          },
           "outputs": {
             "name": {
               "type": "string",
@@ -958,7 +985,7 @@
               "metadata": {
                 "description": "The location the resource was deployed into."
               },
-              "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries/replications', parameters('registryName'), parameters('name')), '2023-06-01-preview', 'full').location]"
+              "value": "[reference('replication', '2023-06-01-preview', 'full').location]"
             }
           }
         }
@@ -1132,19 +1159,22 @@
           "serviceUri": {
             "value": "[parameters('webhooks')[copyIndex()].serviceUri]"
           },
-          "tags": "[if(contains(parameters('webhooks')[copyIndex()], 'tags'), createObject('value', parameters('webhooks')[copyIndex()].tags), createObject('value', createObject()))]",
+          "tags": {
+            "value": "[coalesce(tryGet(parameters('webhooks')[copyIndex()], 'tags'), parameters('tags'))]"
+          },
           "enableDefaultTelemetry": {
             "value": "[variables('enableReferencedModulesTelemetry')]"
           }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
           "contentVersion": "1.0.0.0",
           "metadata": {
             "_generator": {
               "name": "bicep",
               "version": "0.22.6.54827",
-              "templateHash": "6585565654056170037"
+              "templateHash": "17193481488069435754"
             },
             "name": "Azure Container Registry (ACR) Webhooks",
             "description": "This module deploys an Azure Container Registry (ACR) Webhook.",
@@ -1205,7 +1235,7 @@
             },
             "tags": {
               "type": "object",
-              "defaultValue": {},
+              "nullable": true,
               "metadata": {
                 "description": "Optional. Tags of the resource."
               }
@@ -1232,8 +1262,8 @@
               }
             }
           },
-          "resources": [
-            {
+          "resources": {
+            "defaultTelemetry": {
               "condition": "[parameters('enableDefaultTelemetry')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2021-04-01",
@@ -1247,7 +1277,13 @@
                 }
               }
             },
-            {
+            "registry": {
+              "existing": true,
+              "type": "Microsoft.ContainerRegistry/registries",
+              "apiVersion": "2023-06-01-preview",
+              "name": "[parameters('registryName')]"
+            },
+            "webhook": {
               "type": "Microsoft.ContainerRegistry/registries/webhooks",
               "apiVersion": "2023-06-01-preview",
               "name": "[format('{0}/{1}', parameters('registryName'), parameters('name'))]",
@@ -1259,9 +1295,12 @@
                 "scope": "[parameters('scope')]",
                 "serviceUri": "[parameters('serviceUri')]",
                 "status": "[parameters('status')]"
-              }
+              },
+              "dependsOn": [
+                "registry"
+              ]
             }
-          ],
+          },
           "outputs": {
             "resourceId": {
               "type": "string",
@@ -1289,28 +1328,28 @@
               "metadata": {
                 "description": "The actions of the webhook."
               },
-              "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries/webhooks', parameters('registryName'), parameters('name')), '2023-06-01-preview').actions]"
+              "value": "[reference('webhook').actions]"
             },
             "status": {
               "type": "string",
               "metadata": {
                 "description": "The status of the webhook."
               },
-              "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries/webhooks', parameters('registryName'), parameters('name')), '2023-06-01-preview').status]"
+              "value": "[reference('webhook').status]"
             },
             "provistioningState": {
               "type": "string",
               "metadata": {
                 "description": "The provisioning state of the webhook."
               },
-              "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries/webhooks', parameters('registryName'), parameters('name')), '2023-06-01-preview').provisioningState]"
+              "value": "[reference('webhook').provisioningState]"
             },
             "location": {
               "type": "string",
               "metadata": {
                 "description": "The location the resource was deployed into."
               },
-              "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries/webhooks', parameters('registryName'), parameters('name')), '2023-06-01-preview', 'full').location]"
+              "value": "[reference('webhook', '2023-06-01-preview', 'full').location]"
             }
           }
         }
@@ -1900,12 +1939,12 @@
       },
       "value": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('name'))]"
     },
-    "systemAssignedPrincipalId": {
+    "systemAssignedMIPrincipalId": {
       "type": "string",
       "metadata": {
         "description": "The principal ID of the system assigned identity."
       },
-      "value": "[if(and(parameters('systemAssignedIdentity'), contains(reference('registry', '2023-06-01-preview', 'full').identity, 'principalId')), reference('registry', '2023-06-01-preview', 'full').identity.principalId, '')]"
+      "value": "[if(and(coalesce(tryGet(parameters('managedIdentities'), 'systemAssigned'), false()), contains(reference('registry', '2023-06-01-preview', 'full').identity, 'principalId')), reference('registry', '2023-06-01-preview', 'full').identity.principalId, '')]"
     },
     "location": {
       "type": "string",

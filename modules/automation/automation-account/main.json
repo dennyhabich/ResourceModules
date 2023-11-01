@@ -6,13 +6,36 @@
     "_generator": {
       "name": "bicep",
       "version": "0.22.6.54827",
-      "templateHash": "13507604496073736605"
+      "templateHash": "14935357028056674724"
     },
     "name": "Automation Accounts",
     "description": "This module deploys an Azure Automation Account.",
     "owner": "Azure/module-maintainers"
   },
   "definitions": {
+    "managedIdentitiesType": {
+      "type": "object",
+      "properties": {
+        "systemAssigned": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Enables system assigned managed identity on the resource."
+          }
+        },
+        "userAssignedResourcesIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The resource ID(s) to assign to the resource."
+          }
+        }
+      },
+      "nullable": true
+    },
     "lockType": {
       "type": "object",
       "properties": {
@@ -499,18 +522,10 @@
         "description": "Optional. The diagnostic settings of the service."
       }
     },
-    "systemAssignedIdentity": {
-      "type": "bool",
-      "defaultValue": false,
+    "managedIdentities": {
+      "$ref": "#/definitions/managedIdentitiesType",
       "metadata": {
-        "description": "Optional. Enables system assigned managed identity on the resource."
-      }
-    },
-    "userAssignedIdentities": {
-      "type": "object",
-      "defaultValue": {},
-      "metadata": {
-        "description": "Optional. The ID(s) to assign to the resource."
+        "description": "Optional. The managed identity definition for this resource."
       }
     },
     "lock": {
@@ -527,7 +542,7 @@
     },
     "tags": {
       "type": "object",
-      "defaultValue": {},
+      "nullable": true,
       "metadata": {
         "description": "Optional. Tags of the Automation Account resource."
       }
@@ -542,8 +557,8 @@
   },
   "variables": {
     "enableReferencedModulesTelemetry": false,
-    "identityType": "[if(parameters('systemAssignedIdentity'), if(not(empty(parameters('userAssignedIdentities'))), 'SystemAssigned,UserAssigned', 'SystemAssigned'), if(not(empty(parameters('userAssignedIdentities'))), 'UserAssigned', 'None'))]",
-    "identity": "[if(not(equals(variables('identityType'), 'None')), createObject('type', variables('identityType'), 'userAssignedIdentities', if(not(empty(parameters('userAssignedIdentities'))), parameters('userAssignedIdentities'), null())), null())]",
+    "formattedUserAssignedIdentities": "[reduce(map(coalesce(tryGet(parameters('managedIdentities'), 'userAssignedResourcesIds'), createArray()), lambda('id', createObject(format('{0}', lambdaVariables('id')), createObject()))), createObject(), lambda('cur', 'next', union(lambdaVariables('cur'), lambdaVariables('next'))))]",
+    "identity": "[if(not(empty(parameters('managedIdentities'))), createObject('type', if(coalesce(tryGet(parameters('managedIdentities'), 'systemAssigned'), false()), if(not(empty(coalesce(tryGet(parameters('managedIdentities'), 'userAssignedResourcesIds'), createObject()))), 'SystemAssigned,UserAssigned', 'SystemAssigned'), if(not(empty(coalesce(tryGet(parameters('managedIdentities'), 'userAssignedResourcesIds'), createObject()))), 'UserAssigned', null())), 'userAssignedIdentities', if(not(empty(variables('formattedUserAssignedIdentities'))), variables('formattedUserAssignedIdentities'), null())), null())]",
     "builtInRoleNames": {
       "Automation Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'f353d9bd-d4a6-484e-a77a-8050b599b867')]",
       "Automation Job Operator": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4fe576fe-1146-4730-92eb-48519fa6bf9f')]",
@@ -700,7 +715,7 @@
             "value": "[parameters('location')]"
           },
           "tags": {
-            "value": "[parameters('tags')]"
+            "value": "[coalesce(tryGet(parameters('modules')[copyIndex()], 'tags'), parameters('tags'))]"
           },
           "enableDefaultTelemetry": {
             "value": "[variables('enableReferencedModulesTelemetry')]"
@@ -708,12 +723,13 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
           "contentVersion": "1.0.0.0",
           "metadata": {
             "_generator": {
               "name": "bicep",
               "version": "0.22.6.54827",
-              "templateHash": "15709477569881004771"
+              "templateHash": "18249732142000845439"
             },
             "name": "Automation Account Modules",
             "description": "This module deploys an Azure Automation Account Module.",
@@ -754,7 +770,7 @@
             },
             "tags": {
               "type": "object",
-              "defaultValue": {},
+              "nullable": true,
               "metadata": {
                 "description": "Optional. Tags of the Automation Account resource."
               }
@@ -767,8 +783,8 @@
               }
             }
           },
-          "resources": [
-            {
+          "resources": {
+            "defaultTelemetry": {
               "condition": "[parameters('enableDefaultTelemetry')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2021-04-01",
@@ -782,7 +798,13 @@
                 }
               }
             },
-            {
+            "automationAccount": {
+              "existing": true,
+              "type": "Microsoft.Automation/automationAccounts",
+              "apiVersion": "2022-08-08",
+              "name": "[parameters('automationAccountName')]"
+            },
+            "module": {
               "type": "Microsoft.Automation/automationAccounts/modules",
               "apiVersion": "2022-08-08",
               "name": "[format('{0}/{1}', parameters('automationAccountName'), parameters('name'))]",
@@ -793,9 +815,12 @@
                   "uri": "[if(not(equals(parameters('version'), 'latest')), format('{0}/{1}/{2}', parameters('uri'), parameters('name'), parameters('version')), format('{0}/{1}', parameters('uri'), parameters('name')))]",
                   "version": "[if(not(equals(parameters('version'), 'latest')), parameters('version'), null())]"
                 }
-              }
+              },
+              "dependsOn": [
+                "automationAccount"
+              ]
             }
-          ],
+          },
           "outputs": {
             "name": {
               "type": "string",
@@ -823,7 +848,7 @@
               "metadata": {
                 "description": "The location the resource was deployed into."
               },
-              "value": "[reference(resourceId('Microsoft.Automation/automationAccounts/modules', parameters('automationAccountName'), parameters('name')), '2022-08-08', 'full').location]"
+              "value": "[reference('module', '2022-08-08', 'full').location]"
             }
           }
         }
@@ -1049,11 +1074,17 @@
           "description": "[if(contains(parameters('runbooks')[copyIndex()], 'description'), createObject('value', parameters('runbooks')[copyIndex()].description), createObject('value', ''))]",
           "uri": "[if(contains(parameters('runbooks')[copyIndex()], 'uri'), createObject('value', parameters('runbooks')[copyIndex()].uri), createObject('value', ''))]",
           "version": "[if(contains(parameters('runbooks')[copyIndex()], 'version'), createObject('value', parameters('runbooks')[copyIndex()].version), createObject('value', ''))]",
+          "sasTokenValidityLength": {
+            "value": "[tryGet(parameters('runbooks')[copyIndex()], 'sasTokenValidityLength')]"
+          },
+          "scriptStorageAccountResourceId": {
+            "value": "[tryGet(parameters('runbooks')[copyIndex()], 'scriptStorageAccountResourceId')]"
+          },
           "location": {
             "value": "[parameters('location')]"
           },
           "tags": {
-            "value": "[parameters('tags')]"
+            "value": "[coalesce(tryGet(parameters('runbooks')[copyIndex()], 'tags'), parameters('tags'))]"
           },
           "enableDefaultTelemetry": {
             "value": "[variables('enableReferencedModulesTelemetry')]"
@@ -1061,12 +1092,13 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
           "contentVersion": "1.0.0.0",
           "metadata": {
             "_generator": {
               "name": "bicep",
               "version": "0.22.6.54827",
-              "templateHash": "18248893160569507204"
+              "templateHash": "1833872657708381069"
             },
             "name": "Automation Account Runbooks",
             "description": "This module deploys an Azure Automation Account Runbook.",
@@ -1119,11 +1151,11 @@
                 "description": "Optional. The version of the runbook content."
               }
             },
-            "scriptStorageAccountId": {
+            "scriptStorageAccountResourceId": {
               "type": "string",
-              "defaultValue": "",
+              "nullable": true,
               "metadata": {
-                "description": "Optional. ID of the runbook storage account."
+                "description": "Optional. Resource Id of the runbook storage account."
               }
             },
             "baseTime": {
@@ -1149,7 +1181,7 @@
             },
             "tags": {
               "type": "object",
-              "defaultValue": {},
+              "nullable": true,
               "metadata": {
                 "description": "Optional. Tags of the Automation Account resource."
               }
@@ -1171,8 +1203,8 @@
               "signedProtocol": "https"
             }
           },
-          "resources": [
-            {
+          "resources": {
+            "defaultTelemetry": {
               "condition": "[parameters('enableDefaultTelemetry')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2021-04-01",
@@ -1186,7 +1218,22 @@
                 }
               }
             },
-            {
+            "automationAccount": {
+              "existing": true,
+              "type": "Microsoft.Automation/automationAccounts",
+              "apiVersion": "2022-08-08",
+              "name": "[parameters('automationAccountName')]"
+            },
+            "storageAccount": {
+              "condition": "[not(empty(parameters('scriptStorageAccountResourceId')))]",
+              "existing": true,
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2022-09-01",
+              "subscriptionId": "[split(coalesce(parameters('scriptStorageAccountResourceId'), '//'), '/')[2]]",
+              "resourceGroup": "[split(coalesce(parameters('scriptStorageAccountResourceId'), '////'), '/')[4]]",
+              "name": "[last(split(coalesce(parameters('scriptStorageAccountResourceId'), 'dummyVault'), '/'))]"
+            },
+            "runbook": {
               "type": "Microsoft.Automation/automationAccounts/runbooks",
               "apiVersion": "2022-08-08",
               "name": "[format('{0}/{1}', parameters('automationAccountName'), parameters('name'))]",
@@ -1195,10 +1242,14 @@
               "properties": {
                 "runbookType": "[parameters('type')]",
                 "description": "[parameters('description')]",
-                "publishContentLink": "[if(not(empty(parameters('uri'))), if(empty(parameters('uri')), null(), createObject('uri', if(not(empty(parameters('uri'))), if(empty(parameters('scriptStorageAccountId')), parameters('uri'), format('{0}?{1}', parameters('uri'), listAccountSas(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('scriptStorageAccountId'), '/')[2], split(parameters('scriptStorageAccountId'), '/')[4]), 'Microsoft.Storage/storageAccounts', last(split(parameters('scriptStorageAccountId'), '/'))), '2021-04-01', variables('accountSasProperties')).accountSasToken)), null()), 'version', if(not(empty(parameters('version'))), parameters('version'), null()))), null())]"
-              }
+                "publishContentLink": "[if(not(empty(parameters('uri'))), if(empty(parameters('uri')), null(), createObject('uri', if(not(empty(parameters('uri'))), if(empty(parameters('scriptStorageAccountResourceId')), parameters('uri'), format('{0}?{1}', parameters('uri'), listAccountSas(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(coalesce(parameters('scriptStorageAccountResourceId'), '//'), '/')[2], split(coalesce(parameters('scriptStorageAccountResourceId'), '////'), '/')[4]), 'Microsoft.Storage/storageAccounts', last(split(coalesce(parameters('scriptStorageAccountResourceId'), 'dummyVault'), '/'))), '2021-04-01', variables('accountSasProperties')).accountSasToken)), null()), 'version', if(not(empty(parameters('version'))), parameters('version'), null()))), null())]"
+              },
+              "dependsOn": [
+                "automationAccount",
+                "storageAccount"
+              ]
             }
-          ],
+          },
           "outputs": {
             "name": {
               "type": "string",
@@ -1226,7 +1277,7 @@
               "metadata": {
                 "description": "The location the resource was deployed into."
               },
-              "value": "[reference(resourceId('Microsoft.Automation/automationAccounts/runbooks', parameters('automationAccountName'), parameters('name')), '2022-08-08', 'full').location]"
+              "value": "[reference('runbook', '2022-08-08', 'full').location]"
             }
           }
         }
@@ -1530,8 +1581,8 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('{0}-AutoAccount-LinkedService', uniqueString(deployment().name, parameters('location')))]",
-      "subscriptionId": "[if(not(empty(parameters('linkedWorkspaceResourceId'))), split(parameters('linkedWorkspaceResourceId'), '/')[2], subscription().subscriptionId)]",
-      "resourceGroup": "[if(not(empty(parameters('linkedWorkspaceResourceId'))), split(parameters('linkedWorkspaceResourceId'), '/')[4], resourceGroup().name)]",
+      "subscriptionId": "[if(not(empty(parameters('linkedWorkspaceResourceId'))), split(if(not(empty(parameters('linkedWorkspaceResourceId'))), parameters('linkedWorkspaceResourceId'), '//'), '/')[2], subscription().subscriptionId)]",
+      "resourceGroup": "[if(not(empty(parameters('linkedWorkspaceResourceId'))), split(if(not(empty(parameters('linkedWorkspaceResourceId'))), parameters('linkedWorkspaceResourceId'), '////'), '/')[4], resourceGroup().name)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1556,12 +1607,13 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
           "contentVersion": "1.0.0.0",
           "metadata": {
             "_generator": {
               "name": "bicep",
               "version": "0.22.6.54827",
-              "templateHash": "15022791045507209174"
+              "templateHash": "9970744617970664745"
             },
             "name": "Log Analytics Workspace Linked Services",
             "description": "This module deploys a Log Analytics Workspace Linked Service.",
@@ -1596,7 +1648,7 @@
             },
             "tags": {
               "type": "object",
-              "defaultValue": {},
+              "nullable": true,
               "metadata": {
                 "description": "Optional. Tags to configure in the resource."
               }
@@ -1609,8 +1661,8 @@
               }
             }
           },
-          "resources": [
-            {
+          "resources": {
+            "defaultTelemetry": {
               "condition": "[parameters('enableDefaultTelemetry')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2021-04-01",
@@ -1624,7 +1676,13 @@
                 }
               }
             },
-            {
+            "workspace": {
+              "existing": true,
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "[parameters('logAnalyticsWorkspaceName')]"
+            },
+            "linkedService": {
               "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
               "apiVersion": "2020-08-01",
               "name": "[format('{0}/{1}', parameters('logAnalyticsWorkspaceName'), parameters('name'))]",
@@ -1632,9 +1690,12 @@
               "properties": {
                 "resourceId": "[parameters('resourceId')]",
                 "writeAccessResourceId": "[if(empty(parameters('writeAccessResourceId')), null(), parameters('writeAccessResourceId'))]"
-              }
+              },
+              "dependsOn": [
+                "workspace"
+              ]
             }
-          ],
+          },
           "outputs": {
             "name": {
               "type": "string",
@@ -1673,8 +1734,8 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('{0}-AutoAccount-Solution-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
-      "subscriptionId": "[if(not(empty(parameters('linkedWorkspaceResourceId'))), split(parameters('linkedWorkspaceResourceId'), '/')[2], subscription().subscriptionId)]",
-      "resourceGroup": "[if(not(empty(parameters('linkedWorkspaceResourceId'))), split(parameters('linkedWorkspaceResourceId'), '/')[4], resourceGroup().name)]",
+      "subscriptionId": "[if(not(empty(parameters('linkedWorkspaceResourceId'))), split(if(not(empty(parameters('linkedWorkspaceResourceId'))), parameters('linkedWorkspaceResourceId'), '//'), '/')[2], subscription().subscriptionId)]",
+      "resourceGroup": "[if(not(empty(parameters('linkedWorkspaceResourceId'))), split(if(not(empty(parameters('linkedWorkspaceResourceId'))), parameters('linkedWorkspaceResourceId'), '////'), '/')[4], resourceGroup().name)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -2888,12 +2949,12 @@
       },
       "value": "[resourceGroup().name]"
     },
-    "systemAssignedPrincipalId": {
+    "systemAssignedMIPrincipalId": {
       "type": "string",
       "metadata": {
         "description": "The principal ID of the system assigned identity."
       },
-      "value": "[if(and(parameters('systemAssignedIdentity'), contains(reference('automationAccount', '2022-08-08', 'full').identity, 'principalId')), reference('automationAccount', '2022-08-08', 'full').identity.principalId, '')]"
+      "value": "[if(and(coalesce(tryGet(parameters('managedIdentities'), 'systemAssigned'), false()), contains(reference('automationAccount', '2022-08-08', 'full').identity, 'principalId')), reference('automationAccount', '2022-08-08', 'full').identity.principalId, '')]"
     },
     "location": {
       "type": "string",
