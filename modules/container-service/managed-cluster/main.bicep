@@ -415,7 +415,7 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2022-09-01' = if (ena
   }
 }
 
-resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-06-02-preview' = {
+resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
   name: name
   location: location
   tags: tags
@@ -436,7 +436,9 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-06-02-p
     ingressProfile: {
       webAppRouting: {
         enabled: webApplicationRoutingEnabled
-        dnsZoneResourceId: !empty(dnsZoneResourceId) ? dnsZoneResourceId : null
+        dnsZoneResourceIds: !empty(dnsZoneResourceId) ? [
+          dnsZoneResourceId
+        ] : null
       }
     }
     addonProfiles: {
@@ -529,23 +531,23 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-06-02-p
     autoUpgradeProfile: {
       upgradeChannel: !empty(autoUpgradeProfileUpgradeChannel) ? autoUpgradeProfileUpgradeChannel : null
     }
-    // azureMonitorProfile: {
-    //   logs: {
-    //     appMonitoring: {
-    //       enabled: !empty(monitoringWorkspaceId)
-    //     }
-    //     containerInsights: {
-    //       enabled: !empty(monitoringWorkspaceId)
-    //       logAnalyticsWorkspaceResourceId: !empty(monitoringWorkspaceId) ? monitoringWorkspaceId : null
-    //     }
-    //   }
-    //   metrics: {
-    //     enabled: false
-    //     appMonitoringOpenTelemetryMetrics: {
-    //       enabled: false
-    //     }
-    //   }
-    // }
+    azureMonitorProfile: {
+      logs: {
+        appMonitoring: {
+          enabled: !empty(monitoringWorkspaceId)
+        }
+        containerInsights: {
+          enabled: !empty(monitoringWorkspaceId)
+          logAnalyticsWorkspaceResourceId: !empty(monitoringWorkspaceId) ? monitoringWorkspaceId : null
+        }
+      }
+      metrics: {
+        enabled: false
+        appMonitoringOpenTelemetryMetrics: {
+          enabled: false
+        }
+      }
+    }
     apiServerAccessProfile: {
       authorizedIPRanges: authorizedIPRanges
       disableRunCommand: disableRunCommand
