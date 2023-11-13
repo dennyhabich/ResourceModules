@@ -117,12 +117,6 @@ resource redisEnterprise_diagnosticSettings 'Microsoft.Insights/diagnosticSettin
         enabled: true
       }
     ]
-    logs: diagnosticSetting.?logCategoriesAndGroups ?? [
-      {
-        categoryGroup: 'AllLogs'
-        enabled: true
-      }
-    ]
     marketplacePartnerId: diagnosticSetting.?marketplacePartnerResourceId
     logAnalyticsDestinationType: diagnosticSetting.?logAnalyticsDestinationType
   }
@@ -221,7 +215,7 @@ type roleAssignmentType = {
   principalId: string
 
   @description('Optional. The principal type of the assigned principal ID.')
-  principalType: ('ServicePrincipal' | 'Group' | 'User' | 'ForeignGroup' | 'Device' | null)?
+  principalType: ('ServicePrincipal' | 'Group' | 'User' | 'ForeignGroup' | 'Device')?
 
   @description('Optional. The description of the role assignment.')
   description: string?
@@ -257,16 +251,29 @@ type privateEndpointType = {
 
   @description('Optional. Custom DNS configurations.')
   customDnsConfigs: {
+    @description('Required. Fqdn that resolves to private endpoint ip address.')
     fqdn: string?
+
+    @description('Required. A list of private ip addresses of the private endpoint.')
     ipAddresses: string[]
   }[]?
 
   @description('Optional. A list of IP configurations of the private endpoint. This will be used to map to the First Party Service endpoints.')
   ipConfigurations: {
+    @description('Required. The name of the resource that is unique within a resource group.')
     name: string
-    groupId: string
-    memberName: string
-    privateIpAddress: string
+
+    @description('Required. Properties of private endpoint IP configurations.')
+    properties: {
+      @description('Required. The ID of a group obtained from the remote resource that this private endpoint should connect to.')
+      groupId: string
+
+      @description('Required. The member name of a group obtained from the remote resource that this private endpoint should connect to.')
+      memberName: string
+
+      @description('Required. A private ip address obtained from the private endpoint\'s subnet.')
+      privateIPAddress: string
+    }
   }[]?
 
   @description('Optional. Application security groups in which the private endpoint IP configuration is included.')
@@ -296,22 +303,13 @@ type diagnosticSettingType = {
   name: string?
 
   @description('Optional. The name of logs that will be streamed. "allLogs" includes all possible logs for the resource. Set to \'\' to disable log collection.')
-  logCategoriesAndGroups: {
-    @description('Optional. Name of a Diagnostic Log category for a resource type this setting is applied to. Set the specific logs to collect here.')
-    category: string?
-
-    @description('Optional. Name of a Diagnostic Log category group for a resource type this setting is applied to. Set to \'AllLogs\' to collect all logs.')
-    categoryGroup: string?
-  }[]?
-
-  @description('Optional. The name of logs that will be streamed. "allLogs" includes all possible logs for the resource. Set to \'\' to disable log collection.')
   metricCategories: {
     @description('Required. Name of a Diagnostic Metric category for a resource type this setting is applied to. Set to \'AllMetrics\' to collect all metrics.')
     category: string
   }[]?
 
   @description('Optional. A string indicating whether the export to Log Analytics should use the default destination type, i.e. AzureDiagnostics, or use a destination type.')
-  logAnalyticsDestinationType: ('Dedicated' | 'AzureDiagnostics' | null)?
+  logAnalyticsDestinationType: ('Dedicated' | 'AzureDiagnostics')?
 
   @description('Optional. Resource ID of the diagnostic log analytics workspace. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub.')
   workspaceResourceId: string?

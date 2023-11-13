@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.22.6.54827",
-      "templateHash": "16422154168736567404"
+      "version": "0.23.1.45101",
+      "templateHash": "8496123525886789404"
     },
     "name": "Web/Function Apps",
     "description": "This module deploys a Web or Function App.",
@@ -183,12 +183,18 @@
               "properties": {
                 "fqdn": {
                   "type": "string",
-                  "nullable": true
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Required. Fqdn that resolves to private endpoint ip address."
+                  }
                 },
                 "ipAddresses": {
                   "type": "array",
                   "items": {
                     "type": "string"
+                  },
+                  "metadata": {
+                    "description": "Required. A list of private ip addresses of the private endpoint."
                   }
                 }
               }
@@ -204,16 +210,36 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "type": "string"
+                  "type": "string",
+                  "metadata": {
+                    "description": "Required. The name of the resource that is unique within a resource group."
+                  }
                 },
-                "groupId": {
-                  "type": "string"
-                },
-                "memberName": {
-                  "type": "string"
-                },
-                "privateIpAddress": {
-                  "type": "string"
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "groupId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Required. The ID of a group obtained from the remote resource that this private endpoint should connect to."
+                      }
+                    },
+                    "memberName": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Required. The member name of a group obtained from the remote resource that this private endpoint should connect to."
+                      }
+                    },
+                    "privateIPAddress": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Required. A private ip address obtained from the private endpoint's subnet."
+                      }
+                    }
+                  },
+                  "metadata": {
+                    "description": "Required. Properties of private endpoint IP configurations."
+                  }
                 }
               }
             },
@@ -858,8 +884,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "12140652943143922490"
+              "version": "0.23.1.45101",
+              "templateHash": "12410494471478708764"
             },
             "name": "Site App Settings",
             "description": "This module deploys a Site App Setting.",
@@ -1003,8 +1029,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "1120403064106188130"
+              "version": "0.23.1.45101",
+              "templateHash": "15667145082226037238"
             },
             "name": "Site Auth Settings V2 Config",
             "description": "This module deploys a Site Auth Settings V2 Configuration.",
@@ -1147,6 +1173,7 @@
           },
           "roleAssignments": "[if(contains(parameters('slots')[copyIndex()], 'roleAssignments'), createObject('value', parameters('slots')[copyIndex()].roleAssignments), createObject('value', parameters('roleAssignments')))]",
           "appSettingsKeyValuePairs": "[if(contains(parameters('slots')[copyIndex()], 'appSettingsKeyValuePairs'), createObject('value', parameters('slots')[copyIndex()].appSettingsKeyValuePairs), createObject('value', parameters('appSettingsKeyValuePairs')))]",
+          "basicPublishingCredentialsPolicies": "[if(contains(parameters('slots')[copyIndex()], 'basicPublishingCredentialsPolicies'), createObject('value', parameters('slots')[copyIndex()].basicPublishingCredentialsPolicies), createObject('value', parameters('basicPublishingCredentialsPolicies')))]",
           "lock": {
             "value": "[coalesce(tryGet(parameters('slots')[copyIndex()], 'lock'), parameters('lock'))]"
           },
@@ -1178,8 +1205,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "2776575331575111691"
+              "version": "0.23.1.45101",
+              "templateHash": "8611977667171476388"
             },
             "name": "Web/Function App Deployment Slots",
             "description": "This module deploys a Web or Function App Deployment Slot.",
@@ -1356,12 +1383,18 @@
                       "properties": {
                         "fqdn": {
                           "type": "string",
-                          "nullable": true
+                          "nullable": true,
+                          "metadata": {
+                            "description": "Required. Fqdn that resolves to private endpoint ip address."
+                          }
                         },
                         "ipAddresses": {
                           "type": "array",
                           "items": {
                             "type": "string"
+                          },
+                          "metadata": {
+                            "description": "Required. A list of private ip addresses of the private endpoint."
                           }
                         }
                       }
@@ -1377,16 +1410,36 @@
                       "type": "object",
                       "properties": {
                         "name": {
-                          "type": "string"
+                          "type": "string",
+                          "metadata": {
+                            "description": "Required. The name of the resource that is unique within a resource group."
+                          }
                         },
-                        "groupId": {
-                          "type": "string"
-                        },
-                        "memberName": {
-                          "type": "string"
-                        },
-                        "privateIpAddress": {
-                          "type": "string"
+                        "properties": {
+                          "type": "object",
+                          "properties": {
+                            "groupId": {
+                              "type": "string",
+                              "metadata": {
+                                "description": "Required. The ID of a group obtained from the remote resource that this private endpoint should connect to."
+                              }
+                            },
+                            "memberName": {
+                              "type": "string",
+                              "metadata": {
+                                "description": "Required. The member name of a group obtained from the remote resource that this private endpoint should connect to."
+                              }
+                            },
+                            "privateIPAddress": {
+                              "type": "string",
+                              "metadata": {
+                                "description": "Required. A private ip address obtained from the private endpoint's subnet."
+                              }
+                            }
+                          },
+                          "metadata": {
+                            "description": "Required. Properties of private endpoint IP configurations."
+                          }
                         }
                       }
                     },
@@ -1825,6 +1878,13 @@
                 "description": "Optional. Site redundancy mode."
               }
             },
+            "basicPublishingCredentialsPolicies": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "Optional. The site publishing credential policy names which are associated with the site slot."
+              }
+            },
             "vnetContentShareEnabled": {
               "type": "bool",
               "defaultValue": false,
@@ -2028,8 +2088,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "13223616826795830599"
+                      "version": "0.23.1.45101",
+                      "templateHash": "10562313393461278954"
                     },
                     "name": "Site Slot App Settings",
                     "description": "This module deploys a Site Slot App Setting.",
@@ -2183,8 +2243,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "16157844933162881953"
+                      "version": "0.23.1.45101",
+                      "templateHash": "13215271953171449159"
                     },
                     "name": "Site Slot Auth Settings V2 Config",
                     "description": "This module deploys a Site Auth Settings V2 Configuration.",
@@ -2283,6 +2343,154 @@
                 "slot"
               ]
             },
+            "slot_basicPublishingCredentialsPolicies": {
+              "copy": {
+                "name": "slot_basicPublishingCredentialsPolicies",
+                "count": "[length(parameters('basicPublishingCredentialsPolicies'))]"
+              },
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}-Slot-Publish-Cred-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "appName": {
+                    "value": "[parameters('appName')]"
+                  },
+                  "slotName": {
+                    "value": "[parameters('name')]"
+                  },
+                  "name": {
+                    "value": "[parameters('basicPublishingCredentialsPolicies')[copyIndex()].name]"
+                  },
+                  "allow": "[if(contains(parameters('basicPublishingCredentialsPolicies')[copyIndex()], 'allow'), createObject('value', parameters('basicPublishingCredentialsPolicies')[copyIndex()].allow), createObject('value', null()))]",
+                  "enableDefaultTelemetry": {
+                    "value": "[variables('enableReferencedModulesTelemetry')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.23.1.45101",
+                      "templateHash": "9260112433322771379"
+                    },
+                    "name": "Web Site Slot Basic Publishing Credentials Policies",
+                    "description": "This module deploys a Web Site Slot Basic Publishing Credentials Policy.",
+                    "owner": "Azure/module-maintainers"
+                  },
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "allowedValues": [
+                        "scm",
+                        "ftp"
+                      ],
+                      "metadata": {
+                        "description": "Required. The name of the resource."
+                      }
+                    },
+                    "allow": {
+                      "type": "bool",
+                      "defaultValue": true,
+                      "metadata": {
+                        "description": "Optional. Set to true to enable or false to disable a publishing method."
+                      }
+                    },
+                    "appName": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Conditional. The name of the parent web site. Required if the template is used in a standalone deployment."
+                      }
+                    },
+                    "slotName": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Conditional. The name of the parent web site slot. Required if the template is used in a standalone deployment."
+                      }
+                    },
+                    "location": {
+                      "type": "string",
+                      "defaultValue": "[resourceGroup().location]",
+                      "metadata": {
+                        "description": "Optional. Location for all Resources."
+                      }
+                    },
+                    "enableDefaultTelemetry": {
+                      "type": "bool",
+                      "defaultValue": true,
+                      "metadata": {
+                        "description": "Optional. Enable telemetry via a Globally Unique Identifier (GUID)."
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "condition": "[parameters('enableDefaultTelemetry')]",
+                      "type": "Microsoft.Resources/deployments",
+                      "apiVersion": "2021-04-01",
+                      "name": "[format('pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-{0}', uniqueString(deployment().name, parameters('location')))]",
+                      "properties": {
+                        "mode": "Incremental",
+                        "template": {
+                          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                          "contentVersion": "1.0.0.0",
+                          "resources": []
+                        }
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Web/sites/slots/basicPublishingCredentialsPolicies",
+                      "apiVersion": "2022-09-01",
+                      "name": "[format('{0}/{1}/{2}', parameters('appName'), parameters('slotName'), parameters('name'))]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "allow": "[parameters('allow')]"
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the basic publishing credential policy."
+                      },
+                      "value": "[parameters('name')]"
+                    },
+                    "resourceId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the basic publishing credential policy."
+                      },
+                      "value": "[resourceId('Microsoft.Web/sites/slots/basicPublishingCredentialsPolicies', parameters('appName'), parameters('slotName'), parameters('name'))]"
+                    },
+                    "resourceGroupName": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the resource group the basic publishing credential policy was deployed into."
+                      },
+                      "value": "[resourceGroup().name]"
+                    },
+                    "location": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The location the resource was deployed into."
+                      },
+                      "value": "[reference(resourceId('Microsoft.Web/sites/slots/basicPublishingCredentialsPolicies', parameters('appName'), parameters('slotName'), parameters('name')), '2022-09-01', 'full').location]"
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "app",
+                "slot"
+              ]
+            },
             "slot_hybridConnectionRelays": {
               "copy": {
                 "name": "slot_hybridConnectionRelays",
@@ -2317,8 +2525,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "11888981629758921842"
+                      "version": "0.23.1.45101",
+                      "templateHash": "299894459930368764"
                     },
                     "name": "Web/Function Apps Slot Hybrid Connection Relay",
                     "description": "This module deploys a Site Slot Hybrid Connection Namespace Relay.",
@@ -2498,8 +2706,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "16178508232344722616"
+                      "version": "0.23.1.45101",
+                      "templateHash": "6873008238043407177"
                     },
                     "name": "Private Endpoints",
                     "description": "This module deploys a Private Endpoint.",
@@ -2596,6 +2804,71 @@
                         }
                       },
                       "nullable": true
+                    },
+                    "ipConfigurationsType": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "metadata": {
+                              "description": "Required. The name of the resource that is unique within a resource group."
+                            }
+                          },
+                          "properties": {
+                            "type": "object",
+                            "properties": {
+                              "groupId": {
+                                "type": "string",
+                                "metadata": {
+                                  "description": "Required. The ID of a group obtained from the remote resource that this private endpoint should connect to."
+                                }
+                              },
+                              "memberName": {
+                                "type": "string",
+                                "metadata": {
+                                  "description": "Required. The member name of a group obtained from the remote resource that this private endpoint should connect to."
+                                }
+                              },
+                              "privateIPAddress": {
+                                "type": "string",
+                                "metadata": {
+                                  "description": "Required. A private ip address obtained from the private endpoint's subnet."
+                                }
+                              }
+                            },
+                            "metadata": {
+                              "description": "Required. Properties of private endpoint IP configurations."
+                            }
+                          }
+                        }
+                      },
+                      "nullable": true
+                    },
+                    "customDnsConfigType": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "fqdn": {
+                            "type": "string",
+                            "metadata": {
+                              "description": "Required. Fqdn that resolves to private endpoint ip address."
+                            }
+                          },
+                          "ipAddresses": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "metadata": {
+                              "description": "Required. A list of private ip addresses of the private endpoint."
+                            }
+                          }
+                        }
+                      },
+                      "nullable": true
                     }
                   },
                   "parameters": {
@@ -2632,7 +2905,7 @@
                       }
                     },
                     "ipConfigurations": {
-                      "type": "array",
+                      "$ref": "#/definitions/ipConfigurationsType",
                       "nullable": true,
                       "metadata": {
                         "description": "Optional. A list of IP configurations of the private endpoint. This will be used to map to the First Party Service endpoints."
@@ -2685,7 +2958,7 @@
                       }
                     },
                     "customDnsConfigs": {
-                      "type": "array",
+                      "$ref": "#/definitions/customDnsConfigType",
                       "nullable": true,
                       "metadata": {
                         "description": "Optional. Custom DNS configurations."
@@ -2752,7 +3025,7 @@
                             }
                           }
                         ],
-                        "customDnsConfigs": "[coalesce(parameters('customDnsConfigs'), createArray())]",
+                        "customDnsConfigs": "[parameters('customDnsConfigs')]",
                         "customNetworkInterfaceName": "[coalesce(parameters('customNetworkInterfaceName'), '')]",
                         "ipConfigurations": "[coalesce(parameters('ipConfigurations'), createArray())]",
                         "manualPrivateLinkServiceConnections": "[coalesce(parameters('manualPrivateLinkServiceConnections'), createArray())]",
@@ -2836,8 +3109,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "16391702514342252839"
+                              "version": "0.23.1.45101",
+                              "templateHash": "17578977753131828304"
                             },
                             "name": "Private Endpoint Private DNS Zone Groups",
                             "description": "This module deploys a Private Endpoint Private DNS Zone Group.",
@@ -3028,7 +3301,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('{0}-Site-Publis-Cred-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
+      "name": "[format('{0}-Site-Publish-Cred-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -3041,6 +3314,7 @@
           "name": {
             "value": "[parameters('basicPublishingCredentialsPolicies')[copyIndex()].name]"
           },
+          "allow": "[if(contains(parameters('basicPublishingCredentialsPolicies')[copyIndex()], 'allow'), createObject('value', parameters('basicPublishingCredentialsPolicies')[copyIndex()].allow), createObject('value', null()))]",
           "enableDefaultTelemetry": {
             "value": "[variables('enableReferencedModulesTelemetry')]"
           }
@@ -3051,8 +3325,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "5305729672150633375"
+              "version": "0.23.1.45101",
+              "templateHash": "12054216906297236281"
             },
             "name": "Web Site Basic Publishing Credentials Policies",
             "description": "This module deploys a Web Site Basic Publishing Credentials Policy.",
@@ -3067,6 +3341,13 @@
               ],
               "metadata": {
                 "description": "Required. The name of the resource."
+              }
+            },
+            "allow": {
+              "type": "bool",
+              "defaultValue": true,
+              "metadata": {
+                "description": "Optional. Set to true to enable or false to disable a publishing method."
               }
             },
             "webAppName": {
@@ -3111,7 +3392,7 @@
               "name": "[format('{0}/{1}', parameters('webAppName'), parameters('name'))]",
               "location": "[parameters('location')]",
               "properties": {
-                "allow": true
+                "allow": "[parameters('allow')]"
               }
             }
           ],
@@ -3182,8 +3463,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "10458383238656360850"
+              "version": "0.23.1.45101",
+              "templateHash": "14574905385050050440"
             },
             "name": "Web/Function Apps Hybrid Connection Relay",
             "description": "This module deploys a Site Hybrid Connection Namespace Relay.",
@@ -3356,8 +3637,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "16178508232344722616"
+              "version": "0.23.1.45101",
+              "templateHash": "6873008238043407177"
             },
             "name": "Private Endpoints",
             "description": "This module deploys a Private Endpoint.",
@@ -3454,6 +3735,71 @@
                 }
               },
               "nullable": true
+            },
+            "ipConfigurationsType": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "metadata": {
+                      "description": "Required. The name of the resource that is unique within a resource group."
+                    }
+                  },
+                  "properties": {
+                    "type": "object",
+                    "properties": {
+                      "groupId": {
+                        "type": "string",
+                        "metadata": {
+                          "description": "Required. The ID of a group obtained from the remote resource that this private endpoint should connect to."
+                        }
+                      },
+                      "memberName": {
+                        "type": "string",
+                        "metadata": {
+                          "description": "Required. The member name of a group obtained from the remote resource that this private endpoint should connect to."
+                        }
+                      },
+                      "privateIPAddress": {
+                        "type": "string",
+                        "metadata": {
+                          "description": "Required. A private ip address obtained from the private endpoint's subnet."
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "description": "Required. Properties of private endpoint IP configurations."
+                    }
+                  }
+                }
+              },
+              "nullable": true
+            },
+            "customDnsConfigType": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fqdn": {
+                    "type": "string",
+                    "metadata": {
+                      "description": "Required. Fqdn that resolves to private endpoint ip address."
+                    }
+                  },
+                  "ipAddresses": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "metadata": {
+                      "description": "Required. A list of private ip addresses of the private endpoint."
+                    }
+                  }
+                }
+              },
+              "nullable": true
             }
           },
           "parameters": {
@@ -3490,7 +3836,7 @@
               }
             },
             "ipConfigurations": {
-              "type": "array",
+              "$ref": "#/definitions/ipConfigurationsType",
               "nullable": true,
               "metadata": {
                 "description": "Optional. A list of IP configurations of the private endpoint. This will be used to map to the First Party Service endpoints."
@@ -3543,7 +3889,7 @@
               }
             },
             "customDnsConfigs": {
-              "type": "array",
+              "$ref": "#/definitions/customDnsConfigType",
               "nullable": true,
               "metadata": {
                 "description": "Optional. Custom DNS configurations."
@@ -3610,7 +3956,7 @@
                     }
                   }
                 ],
-                "customDnsConfigs": "[coalesce(parameters('customDnsConfigs'), createArray())]",
+                "customDnsConfigs": "[parameters('customDnsConfigs')]",
                 "customNetworkInterfaceName": "[coalesce(parameters('customNetworkInterfaceName'), '')]",
                 "ipConfigurations": "[coalesce(parameters('ipConfigurations'), createArray())]",
                 "manualPrivateLinkServiceConnections": "[coalesce(parameters('manualPrivateLinkServiceConnections'), createArray())]",
@@ -3694,8 +4040,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "16391702514342252839"
+                      "version": "0.23.1.45101",
+                      "templateHash": "17578977753131828304"
                     },
                     "name": "Private Endpoint Private DNS Zone Groups",
                     "description": "This module deploys a Private Endpoint Private DNS Zone Group.",

@@ -20,6 +20,7 @@ This module deploys a Web or Function App Deployment Slot.
 | `Microsoft.Network/privateEndpoints` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/privateEndpoints) |
 | `Microsoft.Network/privateEndpoints/privateDnsZoneGroups` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/privateEndpoints/privateDnsZoneGroups) |
 | `Microsoft.Web/sites/slots` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Web/2022-09-01/sites/slots) |
+| `Microsoft.Web/sites/slots/basicPublishingCredentialsPolicies` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Web/sites) |
 | `Microsoft.Web/sites/slots/config` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Web/sites) |
 | `Microsoft.Web/sites/slots/hybridConnectionNamespaces/relays` | [2022-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Web/2022-09-01/sites/slots/hybridConnectionNamespaces/relays) |
 
@@ -46,6 +47,7 @@ This module deploys a Web or Function App Deployment Slot.
 | [`appServiceEnvironmentResourceId`](#parameter-appserviceenvironmentresourceid) | string | The resource ID of the app service environment to use for this resource. |
 | [`appSettingsKeyValuePairs`](#parameter-appsettingskeyvaluepairs) | object | The app settings-value pairs except for AzureWebJobsStorage, AzureWebJobsDashboard, APPINSIGHTS_INSTRUMENTATIONKEY and APPLICATIONINSIGHTS_CONNECTION_STRING. |
 | [`authSettingV2Configuration`](#parameter-authsettingv2configuration) | object | The auth settings V2 configuration. |
+| [`basicPublishingCredentialsPolicies`](#parameter-basicpublishingcredentialspolicies) | array | The site publishing credential policy names which are associated with the site slot. |
 | [`clientAffinityEnabled`](#parameter-clientaffinityenabled) | bool | If client affinity is enabled. |
 | [`clientCertEnabled`](#parameter-clientcertenabled) | bool | To enable client certificate authentication (TLS mutual authentication). |
 | [`clientCertExclusionPaths`](#parameter-clientcertexclusionpaths) | string | Client certificate authentication comma-separated exclusion paths. |
@@ -113,6 +115,13 @@ The auth settings V2 configuration.
 - Required: No
 - Type: object
 - Default: `{}`
+
+### Parameter: `basicPublishingCredentialsPolicies`
+
+The site publishing credential policy names which are associated with the site slot.
+- Required: No
+- Type: array
+- Default: `[]`
 
 ### Parameter: `clientAffinityEnabled`
 
@@ -465,14 +474,20 @@ Optional. Custom DNS configurations.
 
 | Name | Required | Type | Description |
 | :-- | :-- | :--| :-- |
-| [`fqdn`](#parameter-privateendpointscustomdnsconfigsfqdn) | No | string |  |
-| [`ipAddresses`](#parameter-privateendpointscustomdnsconfigsipaddresses) | Yes | array |  |
+| [`fqdn`](#parameter-privateendpointscustomdnsconfigsfqdn) | No | string | Required. Fqdn that resolves to private endpoint ip address. |
+| [`ipAddresses`](#parameter-privateendpointscustomdnsconfigsipaddresses) | Yes | array | Required. A list of private ip addresses of the private endpoint. |
 
 ### Parameter: `privateEndpoints.customDnsConfigs.fqdn`
+
+Required. Fqdn that resolves to private endpoint ip address.
+
 - Required: No
 - Type: string
 
 ### Parameter: `privateEndpoints.customDnsConfigs.ipAddresses`
+
+Required. A list of private ip addresses of the private endpoint.
+
 - Required: Yes
 - Type: array
 
@@ -500,26 +515,50 @@ Optional. A list of IP configurations of the private endpoint. This will be used
 
 | Name | Required | Type | Description |
 | :-- | :-- | :--| :-- |
-| [`groupId`](#parameter-privateendpointsipconfigurationsgroupid) | Yes | string |  |
-| [`memberName`](#parameter-privateendpointsipconfigurationsmembername) | Yes | string |  |
-| [`name`](#parameter-privateendpointsipconfigurationsname) | Yes | string |  |
-| [`privateIpAddress`](#parameter-privateendpointsipconfigurationsprivateipaddress) | Yes | string |  |
-
-### Parameter: `privateEndpoints.ipConfigurations.groupId`
-- Required: Yes
-- Type: string
-
-### Parameter: `privateEndpoints.ipConfigurations.memberName`
-- Required: Yes
-- Type: string
+| [`name`](#parameter-privateendpointsipconfigurationsname) | Yes | string | Required. The name of the resource that is unique within a resource group. |
+| [`properties`](#parameter-privateendpointsipconfigurationsproperties) | Yes | object | Required. Properties of private endpoint IP configurations. |
 
 ### Parameter: `privateEndpoints.ipConfigurations.name`
+
+Required. The name of the resource that is unique within a resource group.
+
 - Required: Yes
 - Type: string
 
-### Parameter: `privateEndpoints.ipConfigurations.privateIpAddress`
+### Parameter: `privateEndpoints.ipConfigurations.properties`
+
+Required. Properties of private endpoint IP configurations.
+
+- Required: Yes
+- Type: object
+
+| Name | Required | Type | Description |
+| :-- | :-- | :--| :-- |
+| [`groupId`](#parameter-privateendpointsipconfigurationspropertiesgroupid) | Yes | string | Required. The ID of a group obtained from the remote resource that this private endpoint should connect to. |
+| [`memberName`](#parameter-privateendpointsipconfigurationspropertiesmembername) | Yes | string | Required. The member name of a group obtained from the remote resource that this private endpoint should connect to. |
+| [`privateIPAddress`](#parameter-privateendpointsipconfigurationspropertiesprivateipaddress) | Yes | string | Required. A private ip address obtained from the private endpoint's subnet. |
+
+### Parameter: `privateEndpoints.ipConfigurations.properties.groupId`
+
+Required. The ID of a group obtained from the remote resource that this private endpoint should connect to.
+
 - Required: Yes
 - Type: string
+
+### Parameter: `privateEndpoints.ipConfigurations.properties.memberName`
+
+Required. The member name of a group obtained from the remote resource that this private endpoint should connect to.
+
+- Required: Yes
+- Type: string
+
+### Parameter: `privateEndpoints.ipConfigurations.properties.privateIPAddress`
+
+Required. A private ip address obtained from the private endpoint's subnet.
+
+- Required: Yes
+- Type: string
+
 
 
 ### Parameter: `privateEndpoints.location`
