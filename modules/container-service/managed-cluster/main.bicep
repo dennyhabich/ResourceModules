@@ -542,10 +542,7 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
         }
       }
       metrics: {
-        enabled: false
-        appMonitoringOpenTelemetryMetrics: {
-          enabled: false
-        }
+        enabled: !empty(monitoringWorkspaceId)
       }
     }
     apiServerAccessProfile: {
