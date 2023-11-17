@@ -348,6 +348,12 @@ param httpProxyConfig object = {}
 @description('Optional. Identities associated with the cluster.')
 param identityProfile object = {}
 
+@description('Optional. Enable VNET integration on the managed cluster".')
+param enableVnetIntegration bool = false
+
+@description('Optional. ResourceID of the subnet for the api server. Required when VNET integration is enabled".')
+param vnetIntegrationSubnetId string = ''
+
 var formattedUserAssignedIdentities = reduce(map((managedIdentities.?userAssignedResourceIds ?? []), (id) => { '${id}': {} }), {}, (cur, next) => union(cur, next)) // Converts the flat array to an object like { '${id1}': {}, '${id2}': {} }
 
 var identity = !empty(managedIdentities) ? {
@@ -494,6 +500,7 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
       loadBalancerSku: loadBalancerSku
       loadBalancerProfile: managedOutboundIPCount != 0 ? lbProfile : null
     }
+
     aadProfile: {
       clientAppID: aadProfileClientAppID
       serverAppID: aadProfileServerAppID
@@ -525,12 +532,28 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
     autoUpgradeProfile: {
       upgradeChannel: !empty(autoUpgradeProfileUpgradeChannel) ? autoUpgradeProfileUpgradeChannel : null
     }
+    azureMonitorProfile: {
+      logs: {
+        appMonitoring: {
+          enabled: !empty(monitoringWorkspaceId)
+        }
+        containerInsights: {
+          enabled: !empty(monitoringWorkspaceId)
+          logAnalyticsWorkspaceResourceId: !empty(monitoringWorkspaceId) ? monitoringWorkspaceId : null
+        }
+      }
+      metrics: {
+        enabled: !empty(monitoringWorkspaceId)
+      }
+    }
     apiServerAccessProfile: {
       authorizedIPRanges: authorizedIPRanges
       disableRunCommand: disableRunCommand
       enablePrivateCluster: enablePrivateCluster
       enablePrivateClusterPublicFQDN: enablePrivateClusterPublicFQDN
       privateDNSZone: privateDNSZone
+      enableVnetIntegration: enableVnetIntegration
+      subnetId: vnetIntegrationSubnetId
     }
     podIdentityProfile: {
       allowNetworkPluginKubenet: podIdentityProfileAllowNetworkPluginKubenet
