@@ -348,11 +348,23 @@ param httpProxyConfig object = {}
 @description('Optional. Identities associated with the cluster.')
 param identityProfile object = {}
 
+@description('Optional. The customer managed key definition.')
+param customerManagedKey customerManagedKeyType
+
 @description('Optional. Enable VNET integration on the managed cluster".')
 param enableVnetIntegration bool = false
 
 @description('Optional. ResourceID of the subnet for the api server. Required when VNET integration is enabled".')
 param vnetIntegrationSubnetId string = ''
+
+resource cMKKeyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = if (!empty(customerManagedKey.?keyVaultResourceId)) {
+  name: last(split((customerManagedKey.?keyVaultResourceId ?? 'dummyVault'), '/'))
+  scope: resourceGroup(split((customerManagedKey.?keyVaultResourceId ?? '//'), '/')[2], split((customerManagedKey.?keyVaultResourceId ?? '////'), '/')[4])
+
+  resource cMKKey 'keys@2023-02-01' existing = if (!empty(customerManagedKey.?keyVaultResourceId) && !empty(customerManagedKey.?keyName)) {
+    name: customerManagedKey.?keyName ?? 'dummyKey'
+  }
+}
 
 var formattedUserAssignedIdentities = reduce(map((managedIdentities.?userAssignedResourceIds ?? []), (id) => { '${id}': {} }), {}, (cur, next) => union(cur, next)) // Converts the flat array to an object like { '${id1}': {}, '${id2}': {} }
 
@@ -500,7 +512,6 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
       loadBalancerSku: loadBalancerSku
       loadBalancerProfile: managedOutboundIPCount != 0 ? lbProfile : null
     }
-
     aadProfile: {
       clientAppID: aadProfileClientAppID
       serverAppID: aadProfileServerAppID
@@ -532,20 +543,6 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
     autoUpgradeProfile: {
       upgradeChannel: !empty(autoUpgradeProfileUpgradeChannel) ? autoUpgradeProfileUpgradeChannel : null
     }
-    azureMonitorProfile: {
-      logs: {
-        appMonitoring: {
-          enabled: !empty(monitoringWorkspaceId)
-        }
-        containerInsights: {
-          enabled: !empty(monitoringWorkspaceId)
-          logAnalyticsWorkspaceResourceId: !empty(monitoringWorkspaceId) ? monitoringWorkspaceId : null
-        }
-      }
-      metrics: {
-        enabled: !empty(monitoringWorkspaceId)
-      }
-    }
     apiServerAccessProfile: {
       authorizedIPRanges: authorizedIPRanges
       disableRunCommand: disableRunCommand
@@ -562,6 +559,12 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
       userAssignedIdentityExceptions: podIdentityProfileUserAssignedIdentityExceptions
     }
     securityProfile: {
+      azureKeyVaultKms: !empty(customerManagedKey) ? {
+        enabled: true
+        keyId: !empty(customerManagedKey.?keyVersion ?? '') ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}' : cMKKeyVault::cMKKey.properties.keyUriWithVersion
+        keyVaultNetworkAccess: customerManagedKey!.keyVaultNetworkAccess
+        keyVaultResourceId: customerManagedKey!.keyVaultNetworkAccess == 'Private' ? cMKKeyVault.id : null
+      } : null
       defender: enableAzureDefender ? {
         securityMonitoring: {
           enabled: enableAzureDefender
@@ -829,3 +832,17 @@ type diagnosticSettingType = {
   @description('Optional. The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs.')
   marketplacePartnerResourceId: string?
 }[]?
+
+type customerManagedKeyType = {
+  @description('Required. The resource ID of a key vault to reference a customer managed key for encryption from.')
+  keyVaultResourceId: string
+
+  @description('Required. The name of the customer managed key to use for encryption.')
+  keyName: string
+
+  @description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
+  keyVersion: string?
+
+  @description('Required. Network access of key vault. The possible values are Public and Private. Public means the key vault allows public access from all networks. Private means the key vault disables public access and enables private link. The default value is Public.')
+  keyVaultNetworkAccess: ('Private' | 'Public')
+}?
