@@ -360,6 +360,12 @@ param metricLabelsAllowlist string = ''
 @description('Optional. A comma-separated list of Kubernetes annotation keys.')
 param metricAnnotationsAllowList string = ''
 
+@description('Optional. Enable VNET integration on the managed cluster".')
+param enableVnetIntegration bool = false
+
+@description('Optional. ResourceID of the subnet for the api server. Required when VNET integration is enabled".')
+param vnetIntegrationSubnetId string = ''
+
 resource cMKKeyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = if (!empty(customerManagedKey.?keyVaultResourceId)) {
   name: last(split((customerManagedKey.?keyVaultResourceId ?? 'dummyVault'), '/'))
   scope: resourceGroup(split((customerManagedKey.?keyVaultResourceId ?? '//'), '/')[2], split((customerManagedKey.?keyVaultResourceId ?? '////'), '/')[4])
@@ -552,8 +558,19 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
       enablePrivateCluster: enablePrivateCluster
       enablePrivateClusterPublicFQDN: enablePrivateClusterPublicFQDN
       privateDNSZone: privateDNSZone
+      enableVnetIntegration: enableVnetIntegration
+      subnetId: vnetIntegrationSubnetId
     }
     azureMonitorProfile: {
+      logs: {
+        appMonitoring: {
+          enabled: !empty(monitoringWorkspaceId)
+        }
+        containerInsights: {
+          enabled: !empty(monitoringWorkspaceId)
+          logAnalyticsWorkspaceResourceId: !empty(monitoringWorkspaceId) ? monitoringWorkspaceId : null
+        }
+      }
       metrics: enableAzureMonitorProfileMetrics ? {
         enabled: true
         kubeStateMetrics: {
