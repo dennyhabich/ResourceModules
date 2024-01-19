@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.23.1.45101",
-      "templateHash": "4013697482173328246"
+      "version": "0.24.24.22086",
+      "templateHash": "17801986788893514191"
     },
     "name": "Azure Kubernetes Service (AKS) Managed Clusters",
     "description": "This module deploys an Azure Kubernetes Service (AKS) Managed Cluster.",
@@ -69,7 +69,7 @@
           "roleDefinitionIdOrName": {
             "type": "string",
             "metadata": {
-              "description": "Required. The name of the role to assign. If it cannot be found you can specify the role definition ID instead."
+              "description": "Required. The role to assign. You can provide either the display name of the role definition, the role definition GUID, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'."
             }
           },
           "principalId": {
@@ -923,7 +923,7 @@
     "roleAssignments": {
       "$ref": "#/definitions/roleAssignmentType",
       "metadata": {
-        "description": "Optional. Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'."
+        "description": "Optional. Array of role assignments to create."
       }
     },
     "lock": {
@@ -978,6 +978,27 @@
       "$ref": "#/definitions/customerManagedKeyType",
       "metadata": {
         "description": "Optional. The customer managed key definition."
+      }
+    },
+    "enableAzureMonitorProfileMetrics": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Optional. Whether the metrics profile for the Azure Monitor managed service for Prometheus addon is enabled."
+      }
+    },
+    "metricLabelsAllowlist": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. A comma-separated list of additional Kubernetes label keys."
+      }
+    },
+    "metricAnnotationsAllowList": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. A comma-separated list of Kubernetes annotation keys."
       }
     }
   },
@@ -1171,6 +1192,9 @@
           "enablePrivateClusterPublicFQDN": "[parameters('enablePrivateClusterPublicFQDN')]",
           "privateDNSZone": "[parameters('privateDNSZone')]"
         },
+        "azureMonitorProfile": {
+          "metrics": "[if(parameters('enableAzureMonitorProfileMetrics'), createObject('enabled', true(), 'kubeStateMetrics', createObject('metricAnnotationsAllowList', parameters('metricAnnotationsAllowList'), 'metricLabelsAllowlist', parameters('metricLabelsAllowlist'))), null())]"
+        },
         "podIdentityProfile": {
           "allowNetworkPluginKubenet": "[parameters('podIdentityProfileAllowNetworkPluginKubenet')]",
           "enabled": "[parameters('podIdentityProfileEnable')]",
@@ -1249,7 +1273,7 @@
       "scope": "[format('Microsoft.ContainerService/managedClusters/{0}', parameters('name'))]",
       "name": "[guid(resourceId('Microsoft.ContainerService/managedClusters', parameters('name')), coalesce(parameters('roleAssignments'), createArray())[copyIndex()].principalId, coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName)]",
       "properties": {
-        "roleDefinitionId": "[if(contains(variables('builtInRoleNames'), coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName), variables('builtInRoleNames')[coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName], coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName)]",
+        "roleDefinitionId": "[if(contains(variables('builtInRoleNames'), coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName), variables('builtInRoleNames')[coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName], if(contains(coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName, '/providers/Microsoft.Authorization/roleDefinitions/'), coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName, subscriptionResourceId('Microsoft.Authorization/roleDefinitions', coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName)))]",
         "principalId": "[coalesce(parameters('roleAssignments'), createArray())[copyIndex()].principalId]",
         "description": "[tryGet(coalesce(parameters('roleAssignments'), createArray())[copyIndex()], 'description')]",
         "principalType": "[tryGet(coalesce(parameters('roleAssignments'), createArray())[copyIndex()], 'principalType')]",
@@ -1262,7 +1286,7 @@
       ]
     },
     "dnsZone": {
-      "condition": "[and(not(equals(parameters('dnsZoneResourceId'), null())), parameters('webApplicationRoutingEnabled'))]",
+      "condition": "[and(and(equals(parameters('enableDnsZoneContributorRoleAssignment'), true()), not(equals(parameters('dnsZoneResourceId'), null()))), parameters('webApplicationRoutingEnabled'))]",
       "existing": true,
       "type": "Microsoft.Network/dnsZones",
       "apiVersion": "2018-05-01",
@@ -1351,8 +1375,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.23.1.45101",
-              "templateHash": "13811832596066396545"
+              "version": "0.24.24.22086",
+              "templateHash": "13894804167062746913"
             },
             "name": "Azure Kubernetes Service (AKS) Managed Cluster Agent Pools",
             "description": "This module deploys an Azure Kubernetes Service (AKS) Managed Cluster Agent Pool.",
@@ -1803,8 +1827,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.23.1.45101",
-              "templateHash": "18265527122738367400"
+              "version": "0.24.24.22086",
+              "templateHash": "3622584380025042085"
             },
             "name": "Kubernetes Configuration Extensions",
             "description": "This module deploys a Kubernetes Configuration Extension.",
@@ -1966,8 +1990,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.23.1.45101",
-                      "templateHash": "8985718648814286209"
+                      "version": "0.24.24.22086",
+                      "templateHash": "8976867865582545635"
                     },
                     "name": "Kubernetes Configuration Flux Configurations",
                     "description": "This module deploys a Kubernetes Configuration Flux Configuration.",
@@ -2023,9 +2047,8 @@
                     },
                     "kustomizations": {
                       "type": "object",
-                      "defaultValue": {},
                       "metadata": {
-                        "description": "Optional. Array of kustomizations used to reconcile the artifact pulled by the source type on the cluster."
+                        "description": "Required. Array of kustomizations used to reconcile the artifact pulled by the source type on the cluster."
                       }
                     },
                     "namespace": {
@@ -2079,14 +2102,14 @@
                     },
                     {
                       "type": "Microsoft.KubernetesConfiguration/fluxConfigurations",
-                      "apiVersion": "2022-03-01",
+                      "apiVersion": "2023-05-01",
                       "scope": "[format('Microsoft.ContainerService/managedClusters/{0}', parameters('clusterName'))]",
                       "name": "[parameters('name')]",
                       "properties": {
                         "bucket": "[if(not(empty(parameters('bucket'))), parameters('bucket'), null())]",
                         "configurationProtectedSettings": "[if(not(empty(parameters('configurationProtectedSettings'))), parameters('configurationProtectedSettings'), createObject())]",
                         "gitRepository": "[if(not(empty(parameters('gitRepository'))), parameters('gitRepository'), null())]",
-                        "kustomizations": "[if(not(empty(parameters('kustomizations'))), parameters('kustomizations'), createObject())]",
+                        "kustomizations": "[parameters('kustomizations')]",
                         "namespace": "[parameters('namespace')]",
                         "scope": "[parameters('scope')]",
                         "sourceKind": "[parameters('sourceKind')]",
@@ -2218,6 +2241,13 @@
       },
       "value": "[if(contains(reference('managedCluster'), 'addonProfiles'), if(contains(reference('managedCluster').addonProfiles, 'azureKeyvaultSecretsProvider'), if(contains(reference('managedCluster').addonProfiles.azureKeyvaultSecretsProvider, 'identity'), reference('managedCluster').addonProfiles.azureKeyvaultSecretsProvider.identity.clientId, ''), ''), '')]"
     },
+    "ingressApplicationGatewayIdentityObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Object ID of Application Gateway Ingress Controller (AGIC) identity."
+      },
+      "value": "[coalesce(tryGet(tryGet(tryGet(reference('managedCluster').addonProfiles, 'ingressApplicationGateway'), 'identity'), 'objectId'), '')]"
+    },
     "location": {
       "type": "string",
       "metadata": {
@@ -2238,6 +2268,13 @@
         "description": "The addonProfiles of the Kubernetes cluster."
       },
       "value": "[if(contains(reference('managedCluster'), 'addonProfiles'), reference('managedCluster').addonProfiles, createObject())]"
+    },
+    "webAppRoutingIdentityObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Object ID of Web Application Routing."
+      },
+      "value": "[if(and(and(and(contains(reference('managedCluster'), 'ingressProfile'), contains(reference('managedCluster').ingressProfile, 'webAppRouting')), contains(reference('managedCluster').ingressProfile.webAppRouting, 'identity')), contains(reference('managedCluster').ingressProfile.webAppRouting.identity, 'objectId')), reference('managedCluster').ingressProfile.webAppRouting.identity.objectId, '')]"
     }
   }
 }

@@ -55,6 +55,17 @@ module testDeployment '../../../main.bicep' = [for iteration in [ 'init', 'idem'
   params: {
     enableDefaultTelemetry: enableDefaultTelemetry
     name: '${namePrefix}${serviceShort}001'
+    accessModeSettings: {
+      exclusions: [
+        {
+          ingestionAccessMode: 'PrivateOnly'
+          queryAccessMode: 'PrivateOnly'
+          privateEndpointConnectionName: 'thisisatest'
+        }
+      ]
+      ingestionAccessMode: 'Open'
+      queryAccessMode: 'Open'
+    }
     scopedResources: [
       {
         name: 'scoped1'
@@ -72,13 +83,6 @@ module testDeployment '../../../main.bicep' = [for iteration in [ 'init', 'idem'
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
         }
-      }
-    ]
-    roleAssignments: [
-      {
-        roleDefinitionIdOrName: 'Reader'
-        principalId: nestedDependencies.outputs.managedIdentityPrincipalId
-        principalType: 'ServicePrincipal'
       }
     ]
     tags: {
